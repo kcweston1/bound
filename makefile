@@ -1,5 +1,5 @@
 exe:	src/main.cpp
-	g++ src/*.cpp -lSDL2 -Isrc -std=c++17
+	g++ src/*.cpp -lSDL2 -lSDL2_image -Isrc -std=c++17
 
 run:
 	./a.out

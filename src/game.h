@@ -13,10 +13,10 @@ public:
     Game(); //use an init funtion
     ~Game();
     bool init();
-	void mainLoop();
-	bool eventHandler();
-	void keyboardEvent(int key, bool state, bool repeat);
-	void mouseButtonEvent(int x, int y, uint8_t button, bool state);
+    void mainLoop();
+    bool eventHandler();
+    void keyboardEvent(int key, bool state, bool repeat);
+    void mouseButtonEvent(int x, int y, uint8_t button, bool state);
 private:
     SDL_Window * window_;
     SDL_Renderer * renderer_;

@@ -7,6 +7,7 @@
 #include <SDL2/SDL.h>
 #include "entity.h"
 #include "level.h"
+#include "player.h"
 
 const int W = 640;
 const int H = 480;
@@ -23,6 +24,7 @@ public:
     void keyboardEvent(int key, bool state, bool repeat);
     void mouseButtonEvent(int x, int y, uint8_t button, bool state);
 private:
+    Player player_;
     std::vector<Entity> tiles_;
     std::vector<SDL_Rect> srcRects_;
     std::vector<Level> levels_;

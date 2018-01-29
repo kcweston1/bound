@@ -71,6 +71,9 @@ bool Game::init()
     // Populates vector "levels_" with data from levels
     initLevels();
 
+    // Initialize the Player object;
+    // player_ = Player( ... )
+
     
     return true;
 }

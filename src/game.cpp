@@ -65,7 +65,7 @@ bool Game::init()
     if (texture_ == nullptr)
     {
         std::cout << "Could not create texture:" << IMG_GetError() << '\n';
-        success = false;
+        return false;
     }
 
     return true;

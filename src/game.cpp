@@ -72,9 +72,12 @@ bool Game::init()
     initLevels();
 
     // Initialize the Player object;
-    // player_ = Player( ... )
+    // Player could be an object or a polymorphic sprite.
+    // player_.init(texture_, rect, rect);
+    // player_ = std::make_unique(Sprite(texture_, rect, rect));
+    // (above is the same as: player_ = new Sprite(texture_, rect, rect)
+    // except you never have to call delete)
 
-    
     return true;
 }
 
@@ -92,7 +95,7 @@ void Game::mainLoop()
         for (int i = 0; i < tiles_.size(); ++i)
         {
             SDL_RenderCopy(renderer_,
-                           texture_,
+                           tiles_[i].getTexture(),
                            &tiles_[i].getSrcRect(),
                            &tiles_[i].getDstRect());
         }
@@ -203,7 +206,7 @@ void Game::initLevels()
     y = 0;
     for (int i = 0; i < LevelOne.size(); ++i)
     {
-        tiles_.push_back(Entity({x, y, 32, 32}, srcRects_[LevelOne[i]]));
+        tiles_.push_back(Sprite({x, y, 32, 32}, srcRects_[LevelOne[i]], texture_));
         x = (x + 32) % W;
         if (x == 0)
             y += 32;

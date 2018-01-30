@@ -5,7 +5,7 @@
 #include <algorithm>
 #include <vector>
 #include <SDL2/SDL.h>
-#include "entity.h"
+#include "sprite.h"
 #include "level.h"
 #include "player.h"
 
@@ -24,8 +24,9 @@ public:
     void keyboardEvent(int key, bool state, bool repeat);
     void mouseButtonEvent(int x, int y, uint8_t button, bool state);
 private:
-    Player player_;
-    std::vector<Entity> tiles_;
+    //std::unique_ptr<Sprite> player_;
+    //Player player_;
+    std::vector<Sprite> tiles_;
     std::vector<SDL_Rect> srcRects_;
     std::vector<Level> levels_;
     SDL_Window * window_;

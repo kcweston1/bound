@@ -1,17 +1,17 @@
 #include "player.h"
 
-Player::Player()
-    : Entity(), dir_(0), dx_(0), dy_(0), alive_(true)
+Player::Player(SDL_Texture* texture)
+    : Sprite(texture), dir_(0), dx_(0), dy_(0), alive_(true)
 {}
 
 
-Player::Player(const SDL_Rect& dst)
-    : Entity(dst), dir_(0), dx_(0), dy_(0), alive_(true)
+Player::Player(const SDL_Rect& dst, SDL_Texture* texture)
+    : Sprite(dst, texture), dir_(0), dx_(0), dy_(0), alive_(true)
 {}
 
 
-Player::Player(const SDL_Rect& dst, const SDL_Rect& src)
-    : Entity(dst, src), dir_(0), dx_(0), dy_(0), alive_(true)
+Player::Player(const SDL_Rect& dst, const SDL_Rect& src, SDL_Texture* texture)
+    : Sprite(dst, src, texture), dir_(0), dx_(0), dy_(0), alive_(true)
 {}
 
 
@@ -19,8 +19,8 @@ void Player::move()
 {
     checkCollision();
     
-    SDL_Rect.x += dx_;
-    SDL_Rect.y += dy_;
+    dst_.x += dx_;
+    dst_.y += dy_;
 }
 
 

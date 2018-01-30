@@ -1,16 +1,15 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
-#include "entity.h"
+#include "sprite.h"
 
-class Player : public Entity
+class Player : public Sprite
 {
 public:
-    Player();
-    Player(const SDL_Rect& dst);
-    Player(const SDL_Rect& dst, const SDL_Rect& src);
+    Player(SDL_Texture* texture);
+    Player(const SDL_Rect& dst, SDL_Texture* texture);
+    Player(const SDL_Rect& dst, const SDL_Rect& src, SDL_Texture* texture);
 
-    void move();
     float getDirection();
     void setDirection(float dir);
     void move();

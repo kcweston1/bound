@@ -1,17 +1,17 @@
 #include "player.h"
 
-Player::Player(SDL_Texture* texture)
-    : Sprite(texture), dir_(0), dx_(0), dy_(0), alive_(true)
+Player::Player(SpriteSheet& spriteSheet)
+    : Sprite(spriteSheet), dir_(0), dx_(0), dy_(0), alive_(true)
 {}
 
 
-Player::Player(const SDL_Rect& dst, SDL_Texture* texture)
-    : Sprite(dst, texture), dir_(0), dx_(0), dy_(0), alive_(true)
+Player::Player(const SDL_Rect& dst, SpriteSheet& spriteSheet)
+    : Sprite(dst, spriteSheet), dir_(0), dx_(0), dy_(0), alive_(true)
 {}
 
 
-Player::Player(const SDL_Rect& dst, const SDL_Rect& src, SDL_Texture* texture)
-    : Sprite(dst, src, texture), dir_(0), dx_(0), dy_(0), alive_(true)
+Player::Player(const SDL_Rect& dst, const SDL_Rect& src, SpriteSheet& spriteSheet)
+    : Sprite(dst, src, spriteSheet), dir_(0), dx_(0), dy_(0), alive_(true)
 {}
 
 

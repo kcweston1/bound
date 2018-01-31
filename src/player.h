@@ -2,13 +2,14 @@
 #define PLAYER_H
 
 #include "sprite.h"
+#include "spritesheet.h"
 
 class Player : public Sprite
 {
 public:
-    Player(SDL_Texture* texture);
-    Player(const SDL_Rect& dst, SDL_Texture* texture);
-    Player(const SDL_Rect& dst, const SDL_Rect& src, SDL_Texture* texture);
+    Player(SpriteSheet& spriteSheet);
+    Player(const SDL_Rect& dst, SpriteSheet& spriteSheet);
+    Player(const SDL_Rect& dst, const SDL_Rect& src, SpriteSheet& spriteSheete);
 
     float getDirection();
     void setDirection(float dir);

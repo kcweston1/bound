@@ -2,20 +2,21 @@
 #define SPRITE_H
 
 #include "entity.h"
+#include "spritesheet.h"
 
 class Sprite : public Entity
 {
 public:
-	Sprite(SDL_Texture* texture);
-	Sprite(const SDL_Rect& dst, SDL_Texture* texture);
-	Sprite(const SDL_Rect& dst, const SDL_Rect& src, SDL_Texture* texture);
-	const SDL_Rect& getSrcRect() const;
-	void setSrcRect(const SDL_Rect& src);
-	SDL_Texture* getTexture();
-	void setTexture(SDL_Texture* texture);
+    Sprite(SpriteSheet& spriteSheet);
+    Sprite(const SDL_Rect& dst, SpriteSheet& spriteSheet);
+    Sprite(const SDL_Rect& dst, const SDL_Rect& src, SpriteSheet& spriteSheet);
+    const SDL_Rect& getSrcRect() const;
+    void setSrcRect(const SDL_Rect& src);
+    SpriteSheet& getSpriteSheet();
+    void setSpriteSheet(SpriteSheet& spriteSheet);
 protected:
-	SDL_Rect src_;
-	SDL_Texture* texture_;
+    SDL_Rect src_;
+    SpriteSheet& spriteSheet_;
 };
 
 #endif

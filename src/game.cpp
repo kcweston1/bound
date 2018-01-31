@@ -12,7 +12,6 @@ Game::Game()
 
 Game::~Game()
 {
-    SDL_DestroyTexture(texture_);
     SDL_DestroyRenderer(renderer_);
     SDL_DestroyWindow(window_);
     IMG_Quit();
@@ -22,10 +21,10 @@ Game::~Game()
 
 bool Game::init()
 {
+    bool success = true;
     // Initialize members.
     window_ = nullptr;
     renderer_ = nullptr;
-    texture_ = nullptr;
 
     // Initialize SDL2.
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
@@ -60,13 +59,8 @@ bool Game::init()
         return false;
     }
 
-    texture_ = IMG_LoadTexture(renderer_, "assets/SpriteSheet.png");
-
-    if (texture_ == nullptr)
-    {
-        std::cout << "Could not create texture:" << IMG_GetError() << '\n';
+    if (!tileSheet_.init("assets/SpriteSheet.png", renderer_, SDL_GetWindowPixelFormat(window_)))
         return false;
-    }
 
     // Populates vector "levels_" with data from levels
     initLevels();
@@ -95,7 +89,7 @@ void Game::mainLoop()
         for (int i = 0; i < tiles_.size(); ++i)
         {
             SDL_RenderCopy(renderer_,
-                           tiles_[i].getTexture(),
+                           tiles_[i].getSpriteSheet().getSDLTexture(),
                            &tiles_[i].getSrcRect(),
                            &tiles_[i].getDstRect());
         }
@@ -175,7 +169,7 @@ void Game::initLevels()
 {
     int x = 0;
     int y = 0;
-    
+
     std::vector<int> LevelOne = 
     {
         54, 54, 54, 45, 28, 29, 18, 19, 19, 19, 19, 19, 75, 20, 29, 30, 48, 54, 54, 54,
@@ -206,9 +200,9 @@ void Game::initLevels()
     y = 0;
     for (int i = 0; i < LevelOne.size(); ++i)
     {
-        tiles_.push_back(Sprite({x, y, 32, 32}, srcRects_[LevelOne[i]], texture_));
-        x = (x + 32) % W;
+        tiles_.push_back(Sprite({x, y, 64, 64}, srcRects_[LevelOne[i]], tileSheet_));
+        x = (x + 64) % W;
         if (x == 0)
-            y += 32;
+            y += 64;
     }
 }

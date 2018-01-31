@@ -1,47 +1,40 @@
 #include "sprite.h"
 
-Sprite::Sprite(SDL_Texture* texture)
-{
+Sprite::Sprite(SpriteSheet& spriteSheet)
+    : Sprite({0, 0, 1, 1}, spriteSheet)
+{}
 
+Sprite::Sprite(const SDL_Rect& dst, SpriteSheet& spriteSheet)
+    : Entity(dst), src_({0, 0, 1, 1}), spriteSheet_(spriteSheet)
+{
+    src_ = {0, 0, spriteSheet_.getWidth(), spriteSheet_.getHeight()};
 }
 
 
-Sprite::Sprite(const SDL_Rect& dst, SDL_Texture* texture)
-	: Entity(dst), src_({0, 0, 1, 1}), texture_(texture)
-{
-	if (texture_ != nullptr)
-	{
-		int w, h = 0;
-		SDL_QueryTexture(texture_, nullptr, nullptr, &w, &h);
-		src_ = {0, 0, w, h};
-	}
-}
-
-
-Sprite::Sprite(const SDL_Rect& dst, const SDL_Rect& src, SDL_Texture* texture)
-	: Entity(dst), src_(src), texture_(texture)
+Sprite::Sprite(const SDL_Rect& dst, const SDL_Rect& src, SpriteSheet& spriteSheet)
+    : Entity(dst), src_(src), spriteSheet_(spriteSheet)
 {}
 
 
 const SDL_Rect& Sprite::getSrcRect() const
 {
-	return src_;
+    return src_;
 }
 
 
 void Sprite::setSrcRect(const SDL_Rect& src)
 {
-	src_ = src;
+    src_ = src;
 }
 
 
-SDL_Texture* Sprite::getTexture()
+SpriteSheet& Sprite::getSpriteSheet()
 {
-	return texture_;
+    return spriteSheet_;
 }
 
 
-void Sprite::setTexture(SDL_Texture* texture)
+void Sprite::setSpriteSheet(SpriteSheet& spriteSheet)
 {
-	texture_ = texture;
+    spriteSheet_ = spriteSheet;
 }

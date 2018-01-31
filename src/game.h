@@ -8,9 +8,8 @@
 #include "sprite.h"
 #include "level.h"
 #include "player.h"
-
-const int W = 640;
-const int H = 480;
+#include "spritesheet.h"
+#include "constants.h"
 
 class Game
 {
@@ -31,7 +30,7 @@ private:
     std::vector<Level> levels_;
     SDL_Window * window_;
     SDL_Renderer * renderer_;
-    SDL_Texture * texture_;
+    SpriteSheet tileSheet_;
 };
 
 #endif

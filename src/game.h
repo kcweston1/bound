@@ -23,6 +23,8 @@ public:
     bool eventHandler();
     void keyboardEvent(int key, bool state, bool repeat);
     void mouseButtonEvent(int x, int y, uint8_t button, bool state);
+
+    void issueMoveCommand(int mouseX, int mouseY);
 private:
     Player player_;
     std::vector<Sprite> tiles_;

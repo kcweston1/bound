@@ -110,6 +110,8 @@ void Game::mainLoop()
                        &player_.getDstRect());
 
         SDL_RenderPresent(renderer_);
+
+        player_.move();
     }
 }
 
@@ -159,7 +161,12 @@ bool Game::eventHandler()
 */
 void Game::keyboardEvent(int key, bool state, bool repeat)
 {
-
+    switch (key)
+    {
+        case SDL_SCANCODE_SPACE:
+            std::cout << player_ << std::endl;
+            break;
+    }
 }
 
 
@@ -177,7 +184,14 @@ void Game::keyboardEvent(int key, bool state, bool repeat)
 */
 void Game::mouseButtonEvent(int x, int y, uint8_t button, bool state)
 {
-
+    switch (button)
+    {
+        case SDL_BUTTON_RIGHT:
+            if (state) issueMoveCommand(x, y);
+            break;
+        default:
+            break;
+    }
 }
 
 
@@ -221,4 +235,14 @@ void Game::initLevels()
         if (x == 0)
             y += 64;
     }
+}
+
+
+void Game::issueMoveCommand(int mouseX, int mouseY)
+{
+    // Update the player's direction, target coordinates, etc
+    player_.updateMovement(mouseX, mouseY);
+
+    // Update position of the target "blip" rect
+    // TODO
 }

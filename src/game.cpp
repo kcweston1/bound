@@ -59,8 +59,15 @@ bool Game::init()
         return false;
     }
 
-    if (!tileSheet_.init("assets/SpriteSheet.png", renderer_, SDL_GetWindowPixelFormat(window_)))
+    tileSheet_ = std::shared_ptr<SpriteSheet>(new SpriteSheet());
+    if (!tileSheet_->init("assets/SpriteSheet.png", renderer_, SDL_PIXELFORMAT_RGBA32))
         return false;
+
+    playerSheet_ = std::shared_ptr<SpriteSheet>(new SpriteSheet());
+    if (!playerSheet_->init("assets/Player.png", renderer_, SDL_PIXELFORMAT_RGBA32))
+        return false;
+
+    player_.setSpriteSheet(playerSheet_);
 
     // Populates vector "levels_" with data from levels
     initLevels();
@@ -82,6 +89,8 @@ bool Game::init()
 void Game::mainLoop()
 {
     //Test code moved to initLevels();
+    player_.setSrcRect({0, 0, 138, 138});
+    player_.setDstRect({500, 500, 64, 64});
 
     while (eventHandler())
     {
@@ -89,10 +98,15 @@ void Game::mainLoop()
         for (int i = 0; i < tiles_.size(); ++i)
         {
             SDL_RenderCopy(renderer_,
-                           tiles_[i].getSpriteSheet().getSDLTexture(),
+                           tiles_[i].getSpriteSheet()->getSDLTexture(),
                            &tiles_[i].getSrcRect(),
                            &tiles_[i].getDstRect());
         }
+        SDL_RenderCopy(renderer_,
+                       player_.getSpriteSheet()->getSDLTexture(),
+                       &player_.getSrcRect(),
+                       &player_.getDstRect());
+
         SDL_RenderPresent(renderer_);
     }
 }
@@ -188,7 +202,7 @@ void Game::initLevels()
         54, 54, 54, 97, 34, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 36, 46, 54, 54, 54,
         54, 54, 54, 54, 40, 41, 42, 41, 40, 40, 40, 40, 40, 41, 40, 40, 54, 54, 54, 54
     };
-    
+
     for (int i = 0; i < 110; ++i)
     {
         srcRects_.push_back({x, y, 256, 256});

@@ -1,15 +1,17 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
+#include <memory>
 #include "sprite.h"
 #include "spritesheet.h"
 
 class Player : public Sprite
 {
 public:
-    Player(SpriteSheet& spriteSheet);
-    Player(const SDL_Rect& dst, SpriteSheet& spriteSheet);
-    Player(const SDL_Rect& dst, const SDL_Rect& src, SpriteSheet& spriteSheete);
+    Player();
+    Player(std::shared_ptr<SpriteSheet> spriteSheet);
+    Player(const SDL_Rect& dst, std::shared_ptr<SpriteSheet> spriteSheet);
+    Player(const SDL_Rect& dst, const SDL_Rect& src, std::shared_ptr<SpriteSheet> spriteSheet);
 
     float getDirection();
     void setDirection(float dir);

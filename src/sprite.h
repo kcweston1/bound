@@ -1,22 +1,24 @@
 #ifndef SPRITE_H
 #define SPRITE_H
 
+#include <memory>
 #include "entity.h"
 #include "spritesheet.h"
 
 class Sprite : public Entity
 {
 public:
-    Sprite(SpriteSheet& spriteSheet);
-    Sprite(const SDL_Rect& dst, SpriteSheet& spriteSheet);
-    Sprite(const SDL_Rect& dst, const SDL_Rect& src, SpriteSheet& spriteSheet);
+    Sprite();
+    Sprite(std::shared_ptr<SpriteSheet> spriteSheet);
+    Sprite(const SDL_Rect& dst, std::shared_ptr<SpriteSheet> spriteSheet);
+    Sprite(const SDL_Rect& dst, const SDL_Rect& src, std::shared_ptr<SpriteSheet> spriteSheet);
     const SDL_Rect& getSrcRect() const;
     void setSrcRect(const SDL_Rect& src);
-    SpriteSheet& getSpriteSheet();
-    void setSpriteSheet(SpriteSheet& spriteSheet);
+    std::shared_ptr<SpriteSheet> getSpriteSheet();
+    void setSpriteSheet(std::shared_ptr<SpriteSheet> spriteSheet);
 protected:
     SDL_Rect src_;
-    SpriteSheet& spriteSheet_;
+    std::shared_ptr<SpriteSheet> spriteSheet_;
 };
 
 #endif

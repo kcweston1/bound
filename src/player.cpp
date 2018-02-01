@@ -1,16 +1,20 @@
 #include "player.h"
 
-Player::Player(SpriteSheet& spriteSheet)
+Player::Player()
+  : Sprite(), dir_(0), dx_(0), dy_(0), alive_(true)
+{}
+
+Player::Player(std::shared_ptr<SpriteSheet> spriteSheet)
     : Sprite(spriteSheet), dir_(0), dx_(0), dy_(0), alive_(true)
 {}
 
 
-Player::Player(const SDL_Rect& dst, SpriteSheet& spriteSheet)
+Player::Player(const SDL_Rect& dst, std::shared_ptr<SpriteSheet> spriteSheet)
     : Sprite(dst, spriteSheet), dir_(0), dx_(0), dy_(0), alive_(true)
 {}
 
 
-Player::Player(const SDL_Rect& dst, const SDL_Rect& src, SpriteSheet& spriteSheet)
+Player::Player(const SDL_Rect& dst, const SDL_Rect& src, std::shared_ptr<SpriteSheet> spriteSheet)
     : Sprite(dst, src, spriteSheet), dir_(0), dx_(0), dy_(0), alive_(true)
 {}
 

@@ -85,8 +85,22 @@ bool SpriteSheet::init(const std::string& file, SDL_Renderer* renderer, uint32_t
     SDL_FreeSurface(surface);
 
     // Query the texture for basic data.
-    SDL_QueryTexture(texture_, nullptr, nullptr, &w_, &h_);
+    SDL_QueryTexture(texture_, &format_, nullptr, &w_, &h_);
     SDL_SetTextureBlendMode(texture_, SDL_BLENDMODE_BLEND);
+
+    int x = 0;
+    int y = 0;
+    while (y < h_)
+    {
+        srcRects_.push_back({x, y, 138, 138});
+        if (x + 138 >= w_)
+        {
+            x = 0;
+            y += 138;
+        }
+        else
+            x += 138;
+    }
 
     return true;
 }
@@ -143,9 +157,123 @@ const SDL_Rect& SpriteSheet::operator[](std::size_t pos) const
     return srcRects_[pos];
 }
 
+const SDL_Rect& SpriteSheet::getSrcRect(std::size_t pos) const
+{
+    return srcRects_[pos];
+}
 
-// TODO.
+
 void SpriteSheet::trim()
 {
+    SDL_PixelFormat* pixelFormat;
+    uint32_t* pixels;
+    uint8_t r, g, b, a;
+    int pitch;
+    int topLeft, topRight, bottomLeft, bottomRight;
+    bool alphaFound;
 
+    // Lock the texture. Error checking to make sure the lock didn't fail.
+    if (SDL_LockTexture(texture_, nullptr, reinterpret_cast<void**>(&pixels), &pitch))
+    {
+        std::cout << "Texture failed to lock. " << SDL_GetError() << '\n';
+        return;
+    }
+
+    pixelFormat = SDL_AllocFormat(format_);
+
+    for (SDL_Rect& rect : srcRects_)
+    {
+        // Trim the Y
+        while (1)
+        {
+            alphaFound = false;
+            topLeft = rect.y * w_ + rect.x;
+            for (int i = topLeft; i < topLeft + rect.w; ++i)
+            {
+                SDL_GetRGBA(pixels[i], pixelFormat, &r, &g, &b, &a);
+                if (static_cast<int>(a) > 0)
+                {
+                    alphaFound = true;
+                    break;
+                }
+            }
+            if (alphaFound)
+                break;
+            rect.y++;
+            rect.h--;
+            if (rect.h == 0)
+                break;
+        }
+
+        // Trim the H
+        while (1)
+        {
+            bool alphaFound = false;
+            int bottomLeft = (rect.y + rect.h) * w_ + rect.x;
+            for (int i = bottomLeft; i < bottomLeft + rect.w; ++i)
+            {
+                SDL_GetRGBA(pixels[i], pixelFormat, &r, &g, &b, &a);
+                if (static_cast<int>(a) > 0)
+                {
+                    alphaFound = true;
+                    break;
+                }
+            }
+
+            if (alphaFound)
+                break;
+            rect.h--;
+            if (rect.h == 0)
+                break;
+        }
+
+        // Trim the X
+        while (1)
+        {
+            bool alphaFound = false;
+            int topLeft = rect.y * w_ + rect.x;
+            int bottomLeft = (rect.y + rect.h) * w_ + rect.x;
+            for (int i = topLeft; i < bottomLeft; i += w_)
+            {
+                SDL_GetRGBA(pixels[i], pixelFormat, &r, &g, &b, &a);
+                if (static_cast<int>(a) > 0)
+                {
+                    alphaFound = true;
+                    break;
+                }
+            }
+            if (alphaFound)
+                break;
+            rect.x++;
+            rect.w--;
+            if (rect.w == 0)
+                break;
+        }
+
+        // Trim the W
+        while (1)
+        {
+            bool alphaFound = false;
+            int topRight = rect.y * w_ + rect.x + rect.w;
+            int bottomRight = (rect.y + rect.h) * w_ + rect.x + rect.w;
+            for (int i = topRight; i < bottomRight; i += w_)
+            {
+                SDL_GetRGBA(pixels[i], pixelFormat, &r, &g, &b, &a);
+                if (static_cast<int>(a) > 0)
+                {
+                    alphaFound = true;
+                    break;
+                }
+            }
+            if (alphaFound)
+                break;
+            rect.w--;
+            if (rect.w == 0)
+                break;
+        }
+    }
+
+
+    SDL_UnlockTexture(texture_);
+    SDL_FreeFormat(pixelFormat);
 }

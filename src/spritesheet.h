@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <string>
+#include <algorithm>
 #include <SDL2/SDL.h>
 
 /*
@@ -25,12 +26,14 @@ public:
     void setSrcRects(int offsetX, int offsetY, int tileW, int tileH, int n);
     void addSrcRect(const SDL_Rect& src);
     const SDL_Rect& operator[](std::size_t pos) const;
+    const SDL_Rect& getSrcRect(std::size_t pos) const;
     void trim();
 private:
     std::string file_;
     SDL_Texture* texture_;
     std::vector<SDL_Rect> srcRects_;
     int w_, h_;
+    uint32_t format_;
 };
 
 #endif

@@ -1,6 +1,7 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
+#include <iostream>
 #include <memory>
 #include "sprite.h"
 #include "spritesheet.h"
@@ -15,7 +16,7 @@ public:
 
     
     float getDirection();
-    void setDirection(float dir);
+    void setDirection();
     float getX();
     void setX(float x);
     float getY();
@@ -34,10 +35,13 @@ public:
     bool setAlive(bool alive);
     
     void move();
+    void updateMovement(int mouseX, int mouseY);
     void checkCollision();
     void checkTileCollision();
     void checkScreenCollision();
     void checkObjectCollision();
+
+    
     
     
 private:
@@ -51,5 +55,7 @@ private:
     int targetY_;
     bool alive_;
 };
+
+std::ostream & operator<<(std::ostream & cout, Player & p);
 
 #endif

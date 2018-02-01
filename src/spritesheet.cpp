@@ -27,6 +27,7 @@ bool SpriteSheet::init(const std::string& file, SDL_Renderer* renderer, uint32_t
 
     if (renderer == nullptr)
         return false;
+
     // Load the image.
     SDL_Surface* surface = IMG_Load(file.c_str());
 
@@ -85,6 +86,7 @@ bool SpriteSheet::init(const std::string& file, SDL_Renderer* renderer, uint32_t
 
     // Query the texture for basic data.
     SDL_QueryTexture(texture_, nullptr, nullptr, &w_, &h_);
+    SDL_SetTextureBlendMode(texture_, SDL_BLENDMODE_BLEND);
 
     return true;
 }

@@ -60,12 +60,14 @@ bool Game::init()
     }
 
     tileSheet_ = std::shared_ptr<SpriteSheet>(new SpriteSheet());
-    if (!tileSheet_->init("assets/SpriteSheet.png", renderer_, SDL_PIXELFORMAT_RGBA32))
+    if (!tileSheet_->init("assets/SpriteSheet.png", renderer_, SDL_PIXELFORMAT_RGBA8888))
         return false;
 
     playerSheet_ = std::shared_ptr<SpriteSheet>(new SpriteSheet());
-    if (!playerSheet_->init("assets/Player.png", renderer_, SDL_PIXELFORMAT_RGBA32))
+    if (!playerSheet_->init("assets/Player.png", renderer_, SDL_PIXELFORMAT_RGBA8888))
         return false;
+
+    playerSheet_->trim();
 
     player_.setSpriteSheet(playerSheet_);
 
@@ -89,8 +91,8 @@ bool Game::init()
 void Game::mainLoop()
 {
     //Test code moved to initLevels();
-    player_.setSrcRect({0, 0, 138, 138});
-    player_.setDstRect({500, 500, 64, 64});
+    player_.setSrcRect(playerSheet_->getSrcRect(0));
+    player_.setDstRect({500, 500, PlayerWidth, PlayerHeight});
 
     while (eventHandler())
     {

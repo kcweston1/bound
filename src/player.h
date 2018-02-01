@@ -13,8 +13,26 @@ public:
     Player(const SDL_Rect& dst, std::shared_ptr<SpriteSheet> spriteSheet);
     Player(const SDL_Rect& dst, const SDL_Rect& src, std::shared_ptr<SpriteSheet> spriteSheet);
 
+    
     float getDirection();
     void setDirection(float dir);
+    float getX();
+    void setX(float x);
+    float getY();
+    void setY(float y);
+    float getDx();
+    void setDx(float dx);
+    float getDy();
+    void setDy(float dy);
+    float getSpeed();
+    void setSpeed(float speed);
+    int getTargetX();
+    void setTargetX(int targetX);
+    int getTargetY();
+    void setTargetY(int targetY);
+    bool isAlive();
+    bool setAlive(bool alive);
+    
     void move();
     void checkCollision();
     void checkTileCollision();
@@ -23,9 +41,14 @@ public:
     
     
 private:
-    float dir_; //direction the player sprite is "facing", between 0 and 360
+    int dir_; //Dictates which direction the player sprite is facing, 0-7
+    float x_;
+    float y_;
     float dx_;
     float dy_;
+    float speed_;
+    int targetX_;
+    int targetY_;
     bool alive_;
 };
 

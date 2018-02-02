@@ -99,13 +99,14 @@ void Game::mainLoop()
     while (eventHandler())
     {
         SDL_RenderClear(renderer_);
-        for (int i = 0; i < tiles_.size(); ++i)
+        for (Sprite& tile : level_.getTiles())
         {
             SDL_RenderCopy(renderer_,
-                           tiles_[i].getSpriteSheet()->getSDLTexture(),
-                           &tiles_[i].getSrcRect(),
-                           &tiles_[i].getDstRect());
+                           tile.getSpriteSheet()->getSDLTexture(),
+                           &tile.getSrcRect(),
+                           &tile.getDstRect());
         }
+        
         SDL_RenderCopy(renderer_,
                        player_.getSpriteSheet()->getSDLTexture(),
                        &player_.getSrcRect(),
@@ -199,35 +200,7 @@ void Game::mouseButtonEvent(int x, int y, uint8_t button, bool state)
 
 void Game::initLevels()
 {
-    int x = 0;
-    int y = 0;
-
-    std::vector<int> LevelOne = 
-    {
-        54, 54, 54, 45, 28, 29, 18, 19, 19, 19, 19, 19, 75, 20, 29, 30, 48, 54, 54, 54,
-        54, 54, 54, 47, 31, 32, 22, 22, 22, 22, 22, 22, 78, 22, 32, 33, 46, 54, 54, 54,
-        54, 54, 54, 47, 31, 32, 24, 25, 24, 24, 25, 26, 77, 25, 32, 33, 48, 54, 54, 54,
-        54, 54, 54, 47, 31, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 33, 48, 54, 54, 54,
-        54, 54, 54, 45, 31, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 33, 48, 54, 54, 54,
-        54, 54, 54, 47, 31, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 33, 46, 54, 54, 54,
-        54, 54, 54, 45, 31, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 33, 48, 54, 54, 54,
-        54, 54, 54, 47, 31, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 33, 46, 54, 54, 54,
-        54, 54, 54, 47, 31, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 33, 48, 54, 54, 54,
-        54, 54, 54, 47, 31, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 33, 48, 54, 54, 54,
-        54, 54, 80, 95, 31, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 33, 48, 54, 54, 54,
-        54, 82, 83, 83, 31, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 33, 48, 54, 54, 54,
-        54, 54, 97, 83, 31, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 33, 48, 54, 54, 54,
-        54, 54, 54, 97, 34, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 36, 46, 54, 54, 54,
-        54, 54, 54, 54, 40, 41, 42, 41, 40, 40, 40, 40, 40, 41, 40, 40, 54, 54, 54, 54
-    };
-
-    for (int i = 0; i < LevelOne.size(); ++i)
-    {
-        tiles_.push_back(Sprite({x, y, 64, 64}, tileSheet_->getSrcRect(LevelOne[i]), tileSheet_));
-        x = (x + 64) % W;
-        if (x == 0)
-            y += 64;
-    }
+    level_.generate(tileSheet_, LevelOne, 64, 64);
 }
 
 

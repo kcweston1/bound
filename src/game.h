@@ -11,6 +11,7 @@
 #include "player.h"
 #include "spritesheet.h"
 #include "constants.h"
+#include "config.h"
 
 class Game
 {
@@ -23,12 +24,11 @@ public:
     bool eventHandler();
     void keyboardEvent(int key, bool state, bool repeat);
     void mouseButtonEvent(int x, int y, uint8_t button, bool state);
-
     void issueMoveCommand(int mouseX, int mouseY);
+    
 private:
     Player player_;
-    std::vector<Sprite> tiles_;
-    std::vector<Level> levels_;
+    Level level_;
     SDL_Window * window_;
     SDL_Renderer * renderer_;
     std::shared_ptr<SpriteSheet> tileSheet_;

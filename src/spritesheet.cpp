@@ -87,7 +87,7 @@ bool SpriteSheet::init(const std::string& file, SDL_Renderer* renderer, uint32_t
     // Query the texture for basic data.
     SDL_QueryTexture(texture_, &format_, nullptr, &w_, &h_);
     SDL_SetTextureBlendMode(texture_, SDL_BLENDMODE_BLEND);
-
+/*
     int x = 0;
     int y = 0;
     while (y < h_)
@@ -100,7 +100,7 @@ bool SpriteSheet::init(const std::string& file, SDL_Renderer* renderer, uint32_t
         }
         else
             x += 138;
-    }
+    }*/
 
     return true;
 }
@@ -147,8 +147,7 @@ void SpriteSheet::addSrcRect(const SDL_Rect& src)
     srcRects_.push_back(src);
 }
 
-
-const SDL_Rect& SpriteSheet::operator[](std::size_t pos) const
+const SDL_Rect& SpriteSheet::getSrcRect(std::size_t pos) const
 {
     // Make sure we're not outside the bounds of the vector.
     assert(pos >= 0);
@@ -157,9 +156,23 @@ const SDL_Rect& SpriteSheet::operator[](std::size_t pos) const
     return srcRects_[pos];
 }
 
-const SDL_Rect& SpriteSheet::getSrcRect(std::size_t pos) const
+
+void SpriteSheet::generate(int offsetX, int offsetY, int clipW, int clipH)
 {
-    return srcRects_[pos];
+    int n = (w_ / clipW) * (h_ / clipH);
+    
+    std::generate_n(std::back_inserter(srcRects_), n,
+        [&, offsetX, offsetY]() mutable 
+        {
+            SDL_Rect rect = {offsetX, offsetY, clipW, clipH};
+            offsetX = std::min(offsetX + clipW, w_) % w_;
+            if (offsetX == 0)
+                offsetY += clipH;
+            return rect;
+        }
+    );
+
+    trim();
 }
 
 

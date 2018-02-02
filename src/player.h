@@ -46,6 +46,7 @@ public:
     
 private:
     int dir_; //Dictates which direction the player sprite is facing, 0-7
+    int runState_;
     float x_;
     float y_;
     float dx_;
@@ -54,6 +55,7 @@ private:
     int targetX_;
     int targetY_;
     bool alive_;
+    unsigned int lastTick_;
 };
 
 std::ostream & operator<<(std::ostream & cout, Player & p);

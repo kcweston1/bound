@@ -87,20 +87,6 @@ bool SpriteSheet::init(const std::string& file, SDL_Renderer* renderer, uint32_t
     // Query the texture for basic data.
     SDL_QueryTexture(texture_, &format_, nullptr, &w_, &h_);
     SDL_SetTextureBlendMode(texture_, SDL_BLENDMODE_BLEND);
-/*
-    int x = 0;
-    int y = 0;
-    while (y < h_)
-    {
-        srcRects_.push_back({x, y, 138, 138});
-        if (x + 138 >= w_)
-        {
-            x = 0;
-            y += 138;
-        }
-        else
-            x += 138;
-    }*/
 
     return true;
 }
@@ -156,11 +142,15 @@ const SDL_Rect& SpriteSheet::getSrcRect(std::size_t pos) const
     return srcRects_[pos];
 }
 
-
+/*
+    Generate the source rects for the sprite sheet. Starting at the x and y
+    offset, generate as many clip rects as possible given the w_/h_ of the
+    current texture, and the clipW and clipH passed in.
+*/
 void SpriteSheet::generate(int offsetX, int offsetY, int clipW, int clipH)
 {
     int n = (w_ / clipW) * (h_ / clipH);
-    
+
     std::generate_n(std::back_inserter(srcRects_), n,
         [&, offsetX, offsetY]() mutable 
         {
@@ -175,7 +165,11 @@ void SpriteSheet::generate(int offsetX, int offsetY, int clipW, int clipH)
     trim();
 }
 
-
+/*
+    Trim the sides of every source rect so that each edge contains at least
+    one pixel where alpha > 0. This 'trims away' unused pixels and fits each
+    source rect exactly to the containing sprite.
+*/
 void SpriteSheet::trim()
 {
     SDL_PixelFormat* pixelFormat;

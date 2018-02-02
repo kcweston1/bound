@@ -28,7 +28,6 @@ public:
 private:
     Player player_;
     std::vector<Sprite> tiles_;
-    std::vector<SDL_Rect> srcRects_;
     std::vector<Level> levels_;
     SDL_Window * window_;
     SDL_Renderer * renderer_;

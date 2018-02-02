@@ -67,9 +67,11 @@ bool Game::init()
     if (!playerSheet_->init("assets/Player.png", renderer_, SDL_PIXELFORMAT_RGBA8888))
         return false;
 
-    playerSheet_->trim();
+    tileSheet_->generate(0, 0, 256, 256);
+    playerSheet_->generate(0, 0, 138, 138);
 
     player_.setSpriteSheet(playerSheet_);
+    
 
     // Populates vector "levels_" with data from levels
     initLevels();
@@ -219,18 +221,9 @@ void Game::initLevels()
         54, 54, 54, 54, 40, 41, 42, 41, 40, 40, 40, 40, 40, 41, 40, 40, 54, 54, 54, 54
     };
 
-    for (int i = 0; i < 110; ++i)
-    {
-        srcRects_.push_back({x, y, 256, 256});
-        x = (x + 256) % 2048;
-        if (x == 0)
-            y += 256;
-    }
-    x = 0;
-    y = 0;
     for (int i = 0; i < LevelOne.size(); ++i)
     {
-        tiles_.push_back(Sprite({x, y, 64, 64}, srcRects_[LevelOne[i]], tileSheet_));
+        tiles_.push_back(Sprite({x, y, 64, 64}, tileSheet_->getSrcRect(LevelOne[i]), tileSheet_));
         x = (x + 64) % W;
         if (x == 0)
             y += 64;

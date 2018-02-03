@@ -12,6 +12,7 @@
 #include "spritesheet.h"
 #include "constants.h"
 #include "config.h"
+#include "renderer.h"
 
 class Game
 {
@@ -30,7 +31,7 @@ private:
     Player player_;
     Level level_;
     SDL_Window * window_;
-    SDL_Renderer * renderer_;
+    Renderer renderer_;
     std::shared_ptr<SpriteSheet> tileSheet_;
     std::shared_ptr<SpriteSheet> playerSheet_;
 };

@@ -12,7 +12,7 @@ Game::Game()
 
 Game::~Game()
 {
-    SDL_DestroyRenderer(renderer_);
+    renderer_.free();
     SDL_DestroyWindow(window_);
     IMG_Quit();
     SDL_Quit();
@@ -24,7 +24,6 @@ bool Game::init()
     bool success = true;
     // Initialize members.
     window_ = nullptr;
-    renderer_ = nullptr;
 
     // Initialize SDL2.
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
@@ -49,28 +48,30 @@ bool Game::init()
         return false;
     }
 
+    renderer_.init(window_);
     // Crate the SDL renderer.
-    renderer_ = SDL_CreateRenderer(window_, -1, SDL_RENDERER_ACCELERATED);
+    //renderer_ = SDL_CreateRenderer(window_, -1, SDL_RENDERER_ACCELERATED);
 
     // Error detection for SDL renderer.
-    if (renderer_ == nullptr)
-    {
-        std::cout << "Could not create window:" << SDL_GetError() << '\n';
-        return false;
-    }
+    //if (renderer_ == nullptr)
+    //{
+        //std::cout << "Could not create window:" << SDL_GetError() << '\n';
+        //return false;
+    //}
 
     tileSheet_ = std::shared_ptr<SpriteSheet>(new SpriteSheet());
-    if (!tileSheet_->init("assets/SpriteSheet.png", renderer_, SDL_PIXELFORMAT_RGBA8888))
+    if (!tileSheet_->init("assets/SpriteSheet.png", renderer_.getSDLRenderer(), SDL_PIXELFORMAT_RGBA8888))
         return false;
 
     playerSheet_ = std::shared_ptr<SpriteSheet>(new SpriteSheet());
-    if (!playerSheet_->init("assets/Player.png", renderer_, SDL_PIXELFORMAT_RGBA8888))
+    if (!playerSheet_->init("assets/Player.png", renderer_.getSDLRenderer(), SDL_PIXELFORMAT_RGBA8888))
         return false;
 
     tileSheet_->generate(0, 0, 256, 256);
     playerSheet_->generate(0, 0, 138, 138);
 
-    player_.setSpriteSheet(playerSheet_);
+    //player_.setSpriteSheet(playerSheet_);
+    player_.getSprite().setSpriteSheet(playerSheet_);
     
 
     // Populates vector "levels_" with data from levels
@@ -93,28 +94,21 @@ bool Game::init()
 void Game::mainLoop()
 {
     //Test code moved to initLevels();
-    player_.setSrcRect(playerSheet_->getSrcRect(0));
-    player_.setDstRect({500, 500, PlayerWidth, PlayerHeight});
+    player_.getSprite().setSrcRect(playerSheet_->getSrcRect(0));
+    player_.getSprite().setDstRect({500, 500, PlayerWidth, PlayerHeight});
 
     while (eventHandler())
     {
-        SDL_RenderClear(renderer_);
-        for (Sprite& tile : level_.getTiles())
-        {
-            SDL_RenderCopy(renderer_,
-                           tile.getSpriteSheet()->getSDLTexture(),
-                           &tile.getSrcRect(),
-                           &tile.getDstRect());
-        }
-        
-        SDL_RenderCopy(renderer_,
-                       player_.getSpriteSheet()->getSDLTexture(),
-                       &player_.getSrcRect(),
-                       &player_.getDstRect());
-
-        SDL_RenderPresent(renderer_);
-
+        // Update the game objects.
         player_.move();
+
+        // Submit the sprites to the renderer.
+        for (Sprite& tile : level_.getTiles())
+            renderer_.submit(&tile);
+        renderer_.submit(&player_.getSprite());
+
+        // Render the frame.
+        renderer_.render();
     }
 }
 

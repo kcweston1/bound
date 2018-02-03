@@ -4,25 +4,25 @@
 
 //TODO: make Player::init()
 Player::Player()
-    : Sprite(), dir_(0), runState_(STAND), x_(0), y_(0), dx_(0), dy_(0), speed_(1),
+    : sprite_(), dir_(0), runState_(STAND), x_(0), y_(0), dx_(0), dy_(0), speed_(1),
       targetX_(0), targetY_(0), alive_(true), lastTick_(0) 
 {}
 
 
 Player::Player(std::shared_ptr<SpriteSheet> spriteSheet)
-    : Sprite(spriteSheet), dir_(0), runState_(STAND), x_(0), y_(0), dx_(0), dy_(0), speed_(1),
+    : sprite_(spriteSheet), dir_(0), runState_(STAND), x_(0), y_(0), dx_(0), dy_(0), speed_(1),
       targetX_(0), targetY_(0), alive_(true), lastTick_(0)
 {}
 
 
 Player::Player(const SDL_Rect& dst, std::shared_ptr<SpriteSheet> spriteSheet)
-    : Sprite(dst, spriteSheet), dir_(0), runState_(STAND), x_(dst.x), y_(dst.y), dx_(0), dy_(0),
+    : sprite_(dst, spriteSheet), dir_(0), runState_(STAND), x_(dst.x), y_(dst.y), dx_(0), dy_(0),
       speed_(1), targetX_(0), targetY_(0), alive_(true), lastTick_(0)
 {}
 
 
 Player::Player(const SDL_Rect& dst, const SDL_Rect& src, std::shared_ptr<SpriteSheet> spriteSheet)
-    : Sprite(dst, src, spriteSheet), dir_(0), runState_(STAND), x_(dst.x), y_(dst.y),
+    : sprite_(dst, src, spriteSheet), dir_(0), runState_(STAND), x_(dst.x), y_(dst.y),
       dx_(0), dy_(0), speed_(1), targetX_(0), targetY_(0), alive_(true), lastTick_(0)
 {}
 
@@ -156,6 +156,12 @@ void Player::setTargetY(int targetY)
 }
 
 
+Sprite& Player::getSprite()
+{
+    return sprite_;
+}
+
+
 bool Player::isAlive()
 {
     return alive_;
@@ -178,18 +184,22 @@ void Player::move()
     y_ += speed_ * dy_;
 
     //Update discrete position
-    dst_.x = x_;
-    dst_.y = y_;
+    SDL_Rect current = sprite_.getDstRect();
+    current.x = x_;
+    current.y = y_;
 
     //Has target been met?
-    if (dst_.x == targetX_)
+    if (current.x == targetX_)
     {
         dx_ = 0;
     }
-    if (dst_.y == targetY_)
+    if (current.y == targetY_)
     {
         dy_ = 0;
     }
+
+    //Store updated position
+    sprite_.setDstRect(current);
     
     if (dy_ != 0 || dx_ != 0)
     {
@@ -205,17 +215,18 @@ void Player::move()
         runState_ = STAND;
     
     //Update src rect to correspond to correct sprite
-    src_ = getSpriteSheet()->getSrcRect((dir_ * 8) + runState_);
+    sprite_.setSrcRect(sprite_.getSpriteSheet()->getSrcRect((dir_ * 8) + runState_));
 }
 
 
 void Player::updateMovement(int mouseX, int mouseY)
 {
+    SDL_Rect dst = sprite_.getDstRect();
     targetX_ = mouseX;
     targetY_ = mouseY;
 
-    dx_ = (mouseX - dst_.x) / hypot((mouseX - dst_.x), (mouseY - dst_.y));
-    dy_ = (mouseY - dst_.y) / hypot((mouseX - dst_.x), (mouseY - dst_.y));
+    dx_ = (mouseX - dst.x) / hypot((mouseX - dst.x), (mouseY - dst.y));
+    dy_ = (mouseY - dst.y) / hypot((mouseX - dst.x), (mouseY - dst.y));
 
     setDirection();
 }

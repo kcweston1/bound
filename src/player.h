@@ -6,7 +6,7 @@
 #include "sprite.h"
 #include "spritesheet.h"
 
-class Player : public Sprite
+class Player
 {
 public:
     Player();
@@ -31,6 +31,7 @@ public:
     void setTargetX(int targetX);
     int getTargetY();
     void setTargetY(int targetY);
+    Sprite& getSprite();
     bool isAlive();
     bool setAlive(bool alive);
     
@@ -45,6 +46,7 @@ public:
     
     
 private:
+    Sprite sprite_;
     int dir_; //Dictates which direction the player sprite is facing, 0-7
     int runState_;
     float x_;

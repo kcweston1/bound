@@ -10,6 +10,7 @@ static const int H = 960;
 static const int PlayerWidth = 32;
 static const int PlayerHeight = 32;
 static const float PI = 3.14159;
+static const int Fps = 60;
 
 //Used to calculate player direction
 static const std::pair<float, float> pi_8(cos(PI/8), sin(PI/8));

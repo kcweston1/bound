@@ -5,6 +5,7 @@
 #include <memory>
 #include "sprite.h"
 #include "spritesheet.h"
+#include "level.h"
 
 class Player
 {
@@ -35,10 +36,10 @@ public:
     bool isAlive();
     bool setAlive(bool alive);
     
-    void move();
+    void move(const Level& level);
     void updateMovement(int mouseX, int mouseY);
-    void checkCollision();
-    void checkTileCollision();
+    void checkCollision(const Level& level);
+    void checkTileCollision(const Level& level);
     void checkScreenCollision();
     void checkObjectCollision();
 

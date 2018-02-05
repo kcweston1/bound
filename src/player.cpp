@@ -4,7 +4,7 @@
 
 //TODO: make Player::init()
 Player::Player()
-    : sprite_(), dir_(0), runState_(STAND), x_(0), y_(0), dx_(0), dy_(0), speed_(1),
+    : sprite_(), dir_(0), runState_(STAND), x_(0), y_(0), dx_(0), dy_(0), speed_(2.5f),
       targetX_(0), targetY_(0), alive_(true), lastTick_(0) 
 {}
 
@@ -175,13 +175,13 @@ bool Player::setAlive(bool alive)
 
 
 
-void Player::move()
+void Player::move(const Level& level)
 {
-    checkCollision();
+    checkCollision(level);
 
     //Update real position
-    x_ += speed_ * dx_;
-    y_ += speed_ * dy_;
+    x_ += std::abs(targetX_ - x_) < std::abs(speed_ * dx_) ? targetX_ - x_ : speed_ * dx_;
+    y_ += std::abs(targetY_ - y_) < std::abs(speed_ * dy_) ? targetY_ - y_ : speed_ * dy_;
 
     //Update discrete position
     SDL_Rect current = sprite_.getDstRect();
@@ -225,6 +225,9 @@ void Player::updateMovement(int mouseX, int mouseY)
     targetX_ = mouseX;
     targetY_ = mouseY;
 
+    if (targetX_ == dst.x && targetY_ == dst.y)
+        return;
+
     dx_ = (mouseX - dst.x) / hypot((mouseX - dst.x), (mouseY - dst.y));
     dy_ = (mouseY - dst.y) / hypot((mouseX - dst.x), (mouseY - dst.y));
 
@@ -232,20 +235,27 @@ void Player::updateMovement(int mouseX, int mouseY)
 }
 
 
-void Player::checkCollision()
+void Player::checkCollision(const Level& level)
 {
-    checkTileCollision();
+    checkTileCollision(level);
     checkScreenCollision();
     checkObjectCollision();
 }
 
 
-void Player::checkTileCollision()
+void Player::checkTileCollision(const Level& level)
 {
-/*    
-     checkTileCollision should check against the preset collision rects
-     to determine whether a move should be made.
-*/
+    SDL_Rect newPosY = sprite_.getDstRect();
+    SDL_Rect newPosX = sprite_.getDstRect();
+    newPosX.x = x_ + speed_ * dx_;
+    newPosY.y = y_ + speed_ * dy_;
+    for (const SDL_Rect& rect : level.getBoundary())
+    {
+        if (SDL_HasIntersection(&rect, &newPosX))
+            dx_ = 0;
+        if (SDL_HasIntersection(&rect, &newPosY))
+            dy_ = 0;
+    }
 }
 
 

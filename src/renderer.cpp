@@ -37,7 +37,10 @@ bool Renderer::init(SDL_Window* window)
 void Renderer::free()
 {
     if (renderer_ != nullptr)
+    {
         SDL_DestroyRenderer(renderer_);
+        renderer_ = nullptr;
+    }
 }
 
 
@@ -57,6 +60,7 @@ void Renderer::render()
 {
     // Clear the screen and render the sprites.
     SDL_RenderClear(renderer_);
+
     for (Sprite* sprite : renderables_)
     {
         SDL_RenderCopy(renderer_,
@@ -64,6 +68,7 @@ void Renderer::render()
             &sprite->getSrcRect(),
             &sprite->getDstRect());
     }
+
     SDL_RenderPresent(renderer_);
 
     // Find the time for this frame.

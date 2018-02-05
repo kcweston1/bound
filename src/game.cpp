@@ -68,7 +68,7 @@ bool Game::init()
         return false;
 
     tileSheet_->generate(0, 0, 256, 256);
-    playerSheet_->generate(0, 0, 138, 138);
+    playerSheet_->generate();
 
     //player_.setSpriteSheet(playerSheet_);
     player_.getSprite().setSpriteSheet(playerSheet_);

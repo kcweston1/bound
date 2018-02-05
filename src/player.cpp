@@ -4,26 +4,27 @@
 
 //TODO: make Player::init()
 Player::Player()
-    : sprite_(), dir_(0), runState_(STAND), x_(0), y_(0), dx_(0), dy_(0), speed_(2.5f),
-      targetX_(0), targetY_(0), alive_(true), lastTick_(0) 
+    : sprite_(), dir_(0), runState_(STAND), x_(0), y_(0), dx_(0), dy_(0), speed_(5.0f),
+      accel_(0), targetX_(0), targetY_(0), alive_(true), lastTick_(0) 
 {}
 
 
 Player::Player(std::shared_ptr<SpriteSheet> spriteSheet)
     : sprite_(spriteSheet), dir_(0), runState_(STAND), x_(0), y_(0), dx_(0), dy_(0), speed_(1),
-      targetX_(0), targetY_(0), alive_(true), lastTick_(0)
+      accel_(0), targetX_(0), targetY_(0), alive_(true), lastTick_(0)
 {}
 
 
 Player::Player(const SDL_Rect& dst, std::shared_ptr<SpriteSheet> spriteSheet)
     : sprite_(dst, spriteSheet), dir_(0), runState_(STAND), x_(dst.x), y_(dst.y), dx_(0), dy_(0),
-      speed_(1), targetX_(0), targetY_(0), alive_(true), lastTick_(0)
+      speed_(1), accel_(0), targetX_(0), targetY_(0), alive_(true), lastTick_(0)
 {}
 
 
 Player::Player(const SDL_Rect& dst, const SDL_Rect& src, std::shared_ptr<SpriteSheet> spriteSheet)
     : sprite_(dst, src, spriteSheet), dir_(0), runState_(STAND), x_(dst.x), y_(dst.y),
-      dx_(0), dy_(0), speed_(1), targetX_(0), targetY_(0), alive_(true), lastTick_(0)
+      dx_(0), dy_(0), speed_(1), accel_(0), targetX_(0), targetY_(0),
+      alive_(true), lastTick_(0)
 {}
 
 
@@ -132,6 +133,11 @@ void Player::setSpeed(float speed)
 }
 
 
+float Player::getAccel()
+{
+    return accel_;
+}
+
 int Player::getTargetX()
 {
     return targetX_;
@@ -179,9 +185,15 @@ void Player::move(const Level& level)
 {
     checkCollision(level);
 
+    //Update Acceleration
+    if (accel_ < 1)
+    {
+        accel_ += 0.02;
+    }
+    
     //Update real position
-    x_ += std::abs(targetX_ - x_) < std::abs(speed_ * dx_) ? targetX_ - x_ : speed_ * dx_;
-    y_ += std::abs(targetY_ - y_) < std::abs(speed_ * dy_) ? targetY_ - y_ : speed_ * dy_;
+    x_ += std::abs(targetX_ - x_) < std::abs(accel_ * speed_ * dx_) ? targetX_ - x_ : accel_ * speed_ * dx_;
+    y_ += std::abs(targetY_ - y_) < std::abs(accel_ * speed_ * dy_) ? targetY_ - y_ : accel_ * speed_ * dy_;
 
     //Update discrete position
     SDL_Rect current = sprite_.getDstRect();
@@ -212,7 +224,10 @@ void Player::move(const Level& level)
         }
     }
     else
+    {
+        accel_ = 0;
         runState_ = STAND;
+    }
     
     //Update src rect to correspond to correct sprite
     sprite_.setSrcRect(sprite_.getSpriteSheet()->getSrcRect((dir_ * 8) + runState_));
@@ -247,8 +262,8 @@ void Player::checkTileCollision(const Level& level)
 {
     SDL_Rect newPosY = sprite_.getDstRect();
     SDL_Rect newPosX = sprite_.getDstRect();
-    newPosX.x = x_ + speed_ * dx_;
-    newPosY.y = y_ + speed_ * dy_;
+    newPosX.x = x_ + (accel_ * speed_ * dx_);
+    newPosY.y = y_ + (accel_ * speed_ * dy_);
     for (const SDL_Rect& rect : level.getBoundary())
     {
         if (SDL_HasIntersection(&rect, &newPosX))
@@ -287,6 +302,7 @@ std::ostream & operator<<(std::ostream & cout, Player & p)
          << " dx:" << p.getDx()
          << " dy:" << p.getDy()
          << " speed:" << p.getSpeed()
+         << " accel:" << p.getAccel()
          << " target x:" << p.getTargetX()
          << " target y:" << p.getTargetY()
          << " alive:" << p.isAlive();

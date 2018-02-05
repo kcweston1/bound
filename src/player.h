@@ -28,6 +28,7 @@ public:
     void setDy(float dy);
     float getSpeed();
     void setSpeed(float speed);
+    float getAccel();
     int getTargetX();
     void setTargetX(int targetX);
     int getTargetY();
@@ -55,6 +56,7 @@ private:
     float dx_;
     float dy_;
     float speed_;
+    float accel_; //0.0-1.0
     int targetX_;
     int targetY_;
     bool alive_;

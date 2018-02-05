@@ -26,6 +26,7 @@ public:
     void setSrcRects(int offsetX, int offsetY, int tileW, int tileH, int n);
     void addSrcRect(const SDL_Rect& src);
     const SDL_Rect& getSrcRect(std::size_t pos) const;
+    void generate();
     void generate(int offsetX, int offsetY, int clipW, int clipH);
     void trim();
 private:

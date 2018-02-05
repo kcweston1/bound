@@ -28,65 +28,18 @@ bool SpriteSheet::init(const std::string& file, SDL_Renderer* renderer, uint32_t
     if (renderer == nullptr)
         return false;
 
-    // Load the image.
-    SDL_Surface* surface = IMG_Load(file.c_str());
+    // Create the SDL Texture.
+    texture_ = IMG_LoadTexture(renderer, file_.c_str());
 
-    // Check the image loaded correctly into the surface.
-    if (surface == nullptr)
-    {
-        std::cout << "Unable to load image " << file << " " 
-                  << IMG_GetError() << std::endl;
-        return false;
-    }
-
-    // Convert the surface to confirm the display format is correct.
-    SDL_Surface* formatted = SDL_ConvertSurfaceFormat(surface, 
-                                                      pixelFormat, 
-                                                      0);
-
-    // Confirm the conversion was successful.
-    if (formatted == nullptr)
-    {
-        std::cout << "Cannot convert loaded surface to display format! "
-                  << SDL_GetError() << std::endl;
-        return false;
-    }
-
-    // Create a texture. Use the SDL_TEXTUREACCESS_STREAMING flag so that we
-    // can access texture pixel data later.
-    texture_ = SDL_CreateTexture(renderer, 
-                                 pixelFormat, 
-                                 SDL_TEXTUREACCESS_STREAMING, 
-                                 formatted->w,
-                                 formatted->h);
-
-    // Confirm the texture created correctly.
+    // Error checking.
     if (texture_ == nullptr)
     {
-        std::cout << "Unable to create texture " << SDL_GetError() << std::endl;
+        std::cout << "Could not create texture:" << IMG_GetError() << std::endl;
         return false;
     }
-
-    void* pixels;
-    int pitch;
-
-    // Lock the texture to access the pixel data.
-    SDL_LockTexture(texture_, nullptr, &pixels, &pitch);
-
-    // Copy the pixel data from the formatted surface to the texture.
-    memcpy(pixels, formatted->pixels, formatted->pitch * formatted->h);    
-
-    // Now that the copying is complete, unlock the texture.
-    SDL_UnlockTexture(texture_);
-
-    // Free the temporary surfaces.
-    pixels = nullptr;
-    SDL_FreeSurface(formatted);
-    SDL_FreeSurface(surface);
 
     // Query the texture for basic data.
     SDL_QueryTexture(texture_, &format_, nullptr, &w_, &h_);
-    SDL_SetTextureBlendMode(texture_, SDL_BLENDMODE_BLEND);
 
     return true;
 }
@@ -142,6 +95,150 @@ const SDL_Rect& SpriteSheet::getSrcRect(std::size_t pos) const
     return srcRects_[pos];
 }
 
+
+void SpriteSheet::generate()
+{
+    // When the sprites are sorted, give the Y value a margin so that sprites
+    // in the same row will be sorted by their X value only, as long as their
+    // y value is within the y margin.
+    const int YMargin = 10;
+
+    // Create a temporary SDL surface in order to access the pixel data.
+    SDL_Surface* surface = IMG_Load(file_.c_str());
+
+    if (surface == nullptr)
+    {
+        std::cout << "Image " << IMG_GetError() << " could not be loaded.\n";
+        return;
+    }
+
+    uint32_t* pixels = reinterpret_cast<uint32_t*>(surface->pixels);
+
+    // Store the alpha mask for this surface.
+    const int AlphaMask = surface->format->Amask;
+
+    bool found, change, alphaFound;
+
+    for (int y = 0; y < surface->h; ++y)
+    {
+        for (int x = 0; x < surface->w; ++x)
+        {
+            found = false;
+            // Check if the pixel has an alpha value > 0.
+            if ((AlphaMask & pixels[y * surface->w + x]) == 0)
+                continue;
+
+            // If the point is already contained inside a source rect, skip over
+            // the rect and continue searching.
+            SDL_Point pixel = {x, y};
+            for (const SDL_Rect& rect : srcRects_)
+            {
+                if (SDL_PointInRect(&pixel, &rect))
+                {
+                    found = true;
+                    x = rect.x + rect.w;
+                    break;
+                }
+            }
+
+            if (found)
+                continue;
+
+            // Create a rect of size 0.
+            SDL_Rect newRect = {x, y, 0, 0};
+            change = true;
+            while (change)
+            {
+                change = false;
+                // Expand the rect down (increase the height). Continue until a 
+                // row of pixels is found where all alpha values are 0.
+                while (newRect.y + newRect.h + 1 < surface->h)
+                {
+                    alphaFound = false;
+                    for (int i = (newRect.y + newRect.h + 1) * surface->w + newRect.x;
+                        i <= (newRect.y + newRect.h + 1) * surface->w + newRect.x + newRect.w;
+                        ++i)
+                    {
+                        if (AlphaMask & pixels[i])
+                        {
+                            alphaFound = true;
+                            break;
+                        }
+                    }
+                    if (!alphaFound)
+                        break;
+                    newRect.h++;
+                    change = true;
+                }
+
+                // Expand the rect to the left (deccrease the x value). 
+                // Continue until a column of pixels is found where all alpha
+                // values are 0.
+                while (newRect.x - 1 >= 0)
+                {
+                    alphaFound = false;
+                    for (int i = newRect.y * surface->w + newRect.x - 1;
+                        i <= (newRect.y + newRect.h) * surface->w + newRect.x - 1;
+                        i += surface->w)
+                    {
+                        if (AlphaMask & pixels[i])
+                        {
+                            alphaFound = true;
+                            break;
+                        }
+                    }
+                    if (!alphaFound)
+                        break;
+                    newRect.x--;
+                    newRect.w++;
+                    change = true;
+                }
+
+                // Expand the rect to the right (increase the width).
+                // Continue until a column of pixels is found where all alpha
+                // values are 0.
+                while (newRect.x + newRect.w + 1 < surface->w)
+                {
+                    alphaFound = false;
+                    for (int i = newRect.y * surface->w + newRect.x + newRect.w + 1;
+                        i <= (newRect.y + newRect.h) * surface->w + newRect.x + newRect.w + 1;
+                        i += surface->w)
+                    {
+                        if (AlphaMask & pixels[i])
+                        {
+                            alphaFound = true;
+                            break;
+                        }
+                    }
+                    if (!alphaFound)
+                        break;
+                    newRect.w++;
+                    change = true;
+                }
+            }
+
+            // Store the rect if it is not empty.
+            if (!SDL_RectEmpty(&newRect))
+                srcRects_.push_back(newRect);
+        }
+    }
+    // First sort the source rects by the x value (left to right).
+    std::stable_sort(srcRects_.begin(), srcRects_.end(),
+        [](const SDL_Rect& r1, const SDL_Rect& r2) { return r1.x < r2.x; });
+
+    // Second sort the source rects by the y value (top to bottom). Stable sort
+    // is used so the order from the previous sort does not change. YMargin
+    // is applied during this sort so that sprites in the same row that vary
+    // in their y value by less than the YMargin are sorted is if their y
+    // value was the same.
+    std::stable_sort(srcRects_.begin(), srcRects_.end(),
+        [](const SDL_Rect& r1, const SDL_Rect& r2) {
+        return r1.y < r2.y && std::abs(r1.y - r2.y) > YMargin;
+    });
+
+    SDL_FreeSurface(surface);
+}
+
 /*
     Generate the source rects for the sprite sheet. Starting at the x and y
     offset, generate as many clip rects as possible given the w_/h_ of the
@@ -151,18 +248,13 @@ void SpriteSheet::generate(int offsetX, int offsetY, int clipW, int clipH)
 {
     int n = (w_ / clipW) * (h_ / clipH);
 
-    std::generate_n(std::back_inserter(srcRects_), n,
-        [&, offsetX, offsetY]() mutable 
-        {
-            SDL_Rect rect = {offsetX, offsetY, clipW, clipH};
-            offsetX = std::min(offsetX + clipW, w_) % w_;
-            if (offsetX == 0)
-                offsetY += clipH;
-            return rect;
-        }
-    );
-
-    trim();
+    for (int i = 0; i < n; ++i)
+    {
+        srcRects_.push_back({offsetX, offsetY, clipW, clipH});
+        offsetX = std::min(offsetX + clipW, w_) % w_;
+        if (offsetX == 0)
+            offsetY += clipH;
+    }
 }
 
 /*

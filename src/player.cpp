@@ -222,14 +222,14 @@ void Player::move(const Level& level)
 void Player::updateMovement(int mouseX, int mouseY)
 {
     SDL_Rect dst = sprite_.getDstRect();
-    targetX_ = mouseX;
-    targetY_ = mouseY;
+    targetX_ = mouseX - dst.w / 2;
+    targetY_ = mouseY - (3 * dst.h) / 4 ;
 
     if (targetX_ == dst.x && targetY_ == dst.y)
         return;
 
-    dx_ = (mouseX - dst.x) / hypot((mouseX - dst.x), (mouseY - dst.y));
-    dy_ = (mouseY - dst.y) / hypot((mouseX - dst.x), (mouseY - dst.y));
+    dx_ = (targetX_ - dst.x) / hypot((targetX_ - dst.x), (targetY_ - dst.y));
+    dy_ = (targetY_ - dst.y) / hypot((targetX_ - dst.x), (targetY_ - dst.y));
 
     setDirection();
 }

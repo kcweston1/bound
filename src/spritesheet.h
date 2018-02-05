@@ -20,6 +20,7 @@ public:
     SpriteSheet(const std::string& file, SDL_Renderer* renderer, uint32_t pixelFormat, bool& success);
     ~SpriteSheet();
     bool init(const std::string& file, SDL_Renderer* renderer, uint32_t pixelFormat);
+    void free();
     SDL_Texture* getSDLTexture();
     int getWidth() const;
     int getHeight() const;

@@ -17,7 +17,7 @@ SpriteSheet::SpriteSheet(const std::string& file, SDL_Renderer* renderer, uint32
 
 SpriteSheet::~SpriteSheet()
 {
-    SDL_DestroyTexture(texture_);
+    free();
 }
 
 
@@ -42,6 +42,17 @@ bool SpriteSheet::init(const std::string& file, SDL_Renderer* renderer, uint32_t
     SDL_QueryTexture(texture_, &format_, nullptr, &w_, &h_);
 
     return true;
+}
+
+
+void SpriteSheet::free()
+{
+    if (texture_ != nullptr)
+    {
+        SDL_DestroyTexture(texture_);
+        texture_ = nullptr;
+    }
+
 }
 
 

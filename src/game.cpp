@@ -104,7 +104,9 @@ void Game::mainLoop()
     //Test code moved to initLevels();
     //player_.getSprite().setSrcRect(playerSheet_->getSrcRect(0));
     //player_.getSprite().setDstRect({500, 500, PlayerWidth, PlayerHeight});
-
+    
+   
+    
     while (eventHandler())
     {
         // Update the game objects.
@@ -135,9 +137,10 @@ void Game::mainLoop()
 bool Game::eventHandler()
 {
     SDL_Event event;
-
+    int mouseX, mouseY;
+    
     while (SDL_PollEvent(&event))
-    {
+    {        
         switch (event.type)
         {
         case SDL_KEYDOWN:
@@ -152,6 +155,13 @@ bool Game::eventHandler()
                 event.button.y,
                 event.button.button,
                 static_cast<bool>(event.button.state));
+            break;
+        case SDL_MOUSEMOTION:
+            if (SDL_GetMouseState(&mouseX, &mouseY))
+            {
+                player_.updateMovement(mouseX, mouseY);
+            }
+            
             break;
         case SDL_QUIT:
             SDL_FlushEvents(SDL_QUIT, SDL_LASTEVENT);
@@ -197,6 +207,7 @@ void Game::mouseButtonEvent(int x, int y, uint8_t button, bool state)
     {
         case SDL_BUTTON_RIGHT:
             if (state) issueMoveCommand(x, y);
+            
             break;
         default:
             break;

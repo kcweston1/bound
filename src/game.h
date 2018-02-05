@@ -13,6 +13,7 @@
 #include "constants.h"
 #include "config.h"
 #include "renderer.h"
+#include "explosion.h"
 
 class Game
 {
@@ -34,6 +35,8 @@ private:
     Renderer renderer_;
     std::shared_ptr<SpriteSheet> tileSheet_;
     std::shared_ptr<SpriteSheet> playerSheet_;
+    std::shared_ptr<SpriteSheet> explosionSheet_;
+    Explosion explosion_;
 };
 
 #endif

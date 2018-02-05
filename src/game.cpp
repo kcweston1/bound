@@ -69,11 +69,17 @@ bool Game::init()
     if (!playerSheet_->init("assets/Player.png", renderer_.getSDLRenderer(), SDL_PIXELFORMAT_RGBA8888))
         return false;
 
+    explosionSheet_ = std::shared_ptr<SpriteSheet>(new SpriteSheet());
+    if (!explosionSheet_->init("assets/Explosion.png", renderer_.getSDLRenderer(), SDL_PIXELFORMAT_RGBA8888))
+        return false;
+
     tileSheet_->generate(0, 0, 256, 256);
     playerSheet_->generate();
+    explosionSheet_->generate(0, 0, 100, 100);
 
     //player_.setSpriteSheet(playerSheet_);
     player_.getSprite().setSpriteSheet(playerSheet_);
+    explosion_.getSprite().setSpriteSheet(explosionSheet_);
     
 
     // Populates vector "levels_" with data from levels
@@ -103,11 +109,14 @@ void Game::mainLoop()
     {
         // Update the game objects.
         player_.move(level_);
+        explosion_.update();
 
         // Submit the sprites to the renderer.
         for (Sprite& tile : level_.getTiles())
             renderer_.submit(&tile);
         renderer_.submit(&player_.getSprite());
+        if (explosion_.getActive())
+            renderer_.submit(&explosion_.getSprite());
 
         // Render the frame.
         renderer_.render();
@@ -201,6 +210,7 @@ void Game::initLevels()
     player_.getSprite().setDstRect({W / 2, H / 2, PlayerWidth, PlayerHeight});
     player_.setX(W / 2);
     player_.setY(H / 2);
+    explosion_.getSprite().setDstRect({W / 4, H / 4, 64, 64});
 }
 
 

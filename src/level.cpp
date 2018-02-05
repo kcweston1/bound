@@ -9,8 +9,10 @@ Level::Level(std::vector<int> data)
 
 
 void Level::generate(std::shared_ptr<SpriteSheet> spriteSheet,
-        const std::vector<int>& indicies, int tileW, int tileH)
+        const std::vector<int>& indicies, const std::vector<SDL_Rect>& boundary,
+        int tileW, int tileH)
 {
+    boundary_ = boundary;
     int x = 0;
     int y = 0;
     for (int i : indicies)
@@ -38,4 +40,10 @@ void Level::setData(std::vector<int> data)
 std::vector<Sprite>& Level::getTiles()
 {
     return tiles_;
+}
+
+
+const std::vector<SDL_Rect>& Level::getBoundary() const
+{
+    return boundary_;
 }

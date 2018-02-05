@@ -12,8 +12,9 @@ Game::Game()
 
 Game::~Game()
 {
+    tileSheet_->free();
+    playerSheet_->free();
     renderer_.free();
-    SDL_DestroyWindow(window_);
     IMG_Quit();
     SDL_Quit();
 }
@@ -39,7 +40,7 @@ bool Game::init()
         SDL_WINDOWPOS_UNDEFINED,
         W,
         H,
-        0);
+        SDL_RENDERER_PRESENTVSYNC);
 
     // Error detection for SDL window.
     if (window_ == nullptr)
@@ -48,7 +49,8 @@ bool Game::init()
         return false;
     }
 
-    renderer_.init(window_);
+    if (!renderer_.init(window_))
+        return false;
     // Crate the SDL renderer.
     //renderer_ = SDL_CreateRenderer(window_, -1, SDL_RENDERER_ACCELERATED);
 
@@ -94,13 +96,13 @@ bool Game::init()
 void Game::mainLoop()
 {
     //Test code moved to initLevels();
-    player_.getSprite().setSrcRect(playerSheet_->getSrcRect(0));
-    player_.getSprite().setDstRect({500, 500, PlayerWidth, PlayerHeight});
+    //player_.getSprite().setSrcRect(playerSheet_->getSrcRect(0));
+    //player_.getSprite().setDstRect({500, 500, PlayerWidth, PlayerHeight});
 
     while (eventHandler())
     {
         // Update the game objects.
-        player_.move();
+        player_.move(level_);
 
         // Submit the sprites to the renderer.
         for (Sprite& tile : level_.getTiles())
@@ -109,6 +111,7 @@ void Game::mainLoop()
 
         // Render the frame.
         renderer_.render();
+
     }
 }
 
@@ -194,7 +197,10 @@ void Game::mouseButtonEvent(int x, int y, uint8_t button, bool state)
 
 void Game::initLevels()
 {
-    level_.generate(tileSheet_, LevelOne, 64, 64);
+    level_.generate(tileSheet_, LevelOne, LevelOneBoundary, 64, 64);
+    player_.getSprite().setDstRect({W / 2, H / 2, PlayerWidth, PlayerHeight});
+    player_.setX(W / 2);
+    player_.setY(H / 2);
 }
 
 

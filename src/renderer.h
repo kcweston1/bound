@@ -5,6 +5,7 @@
 #include "constants.h"
 #include "sprite.h"
 #include "player.h"
+#include "timer.h"
 
 class SDL_Renderer;
 class SDL_Window;
@@ -23,7 +24,7 @@ private:
     std::vector<Sprite*> renderables_;
     SDL_Renderer* renderer_;
     int cycles_;
-    uint32_t ticks_;
+    Timer timer_;
 };
 
 #endif

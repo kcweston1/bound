@@ -4,7 +4,7 @@
 Renderer::Renderer()
     : renderer_(nullptr), cycles_(0)
 {
-    ticks_ = SDL_GetTicks();
+    timer_.start();
 }
 
 
@@ -71,14 +71,11 @@ void Renderer::render()
 
     SDL_RenderPresent(renderer_);
 
-    // Find the time for this frame.
-    uint32_t frameTicks = SDL_GetTicks() - ticks_;
-
     // Force the correct FPS.
-    if (frameTicks < TICKS_PER_FRAME)
-        SDL_Delay(TICKS_PER_FRAME - frameTicks);
+    if (timer_.time() < TICKS_PER_FRAME)
+        SDL_Delay(TICKS_PER_FRAME - timer_.time());
 
     renderables_.clear();
 
-    ticks_ = SDL_GetTicks();
+    timer_.start();
 }

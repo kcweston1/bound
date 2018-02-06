@@ -6,6 +6,7 @@
 #include "sprite.h"
 #include "spritesheet.h"
 #include "level.h"
+#include "timer.h"
 
 class Player
 {
@@ -49,6 +50,7 @@ public:
     
 private:
     Sprite sprite_;
+    Timer timer_;
     int dir_; //Dictates which direction the player sprite is facing, 0-7
     int runState_;
     float x_;
@@ -60,7 +62,6 @@ private:
     int targetX_;
     int targetY_;
     bool alive_;
-    unsigned int lastTick_;
 };
 
 std::ostream & operator<<(std::ostream & cout, Player & p);

@@ -5,26 +5,28 @@
 //TODO: make Player::init()
 Player::Player()
     : sprite_(), dir_(0), runState_(STAND), x_(0), y_(0), dx_(0), dy_(0), speed_(5.0f),
-      accel_(0), targetX_(0), targetY_(0), alive_(true), lastTick_(0) 
-{}
+      accel_(0), targetX_(0), targetY_(0), alive_(true)
+{
+    timer_.start();
+}
 
 
 Player::Player(std::shared_ptr<SpriteSheet> spriteSheet)
     : sprite_(spriteSheet), dir_(0), runState_(STAND), x_(0), y_(0), dx_(0), dy_(0), speed_(1),
-      accel_(0), targetX_(0), targetY_(0), alive_(true), lastTick_(0)
+      accel_(0), targetX_(0), targetY_(0), alive_(true)
 {}
 
 
 Player::Player(const SDL_Rect& dst, std::shared_ptr<SpriteSheet> spriteSheet)
     : sprite_(dst, spriteSheet), dir_(0), runState_(STAND), x_(dst.x), y_(dst.y), dx_(0), dy_(0),
-      speed_(1), accel_(0), targetX_(0), targetY_(0), alive_(true), lastTick_(0)
+      speed_(1), accel_(0), targetX_(0), targetY_(0), alive_(true)
 {}
 
 
 Player::Player(const SDL_Rect& dst, const SDL_Rect& src, std::shared_ptr<SpriteSheet> spriteSheet)
     : sprite_(dst, src, spriteSheet), dir_(0), runState_(STAND), x_(dst.x), y_(dst.y),
       dx_(0), dy_(0), speed_(1), accel_(0), targetX_(0), targetY_(0),
-      alive_(true), lastTick_(0)
+      alive_(true)
 {}
 
 
@@ -215,12 +217,11 @@ void Player::move(const Level& level)
     
     if (dy_ != 0 || dx_ != 0)
     {
-        unsigned int currentTick = SDL_GetTicks();
-        if (currentTick > lastTick_ + 100)
+        if (timer_.time() > 100)
         {
             ++runState_;
             if (runState_ == 8) runState_ = 0;
-            lastTick_ = currentTick;
+            timer_.start();
         }
     }
     else

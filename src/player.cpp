@@ -183,13 +183,13 @@ bool Player::setAlive(bool alive)
 
 void Player::move(const Level& level)
 {
-    checkCollision(level);
-
     //Update Acceleration
     if (accel_ < 1)
     {
         accel_ += 0.02;
     }
+    
+    checkCollision(level);
     
     //Update real position
     x_ += std::abs(targetX_ - x_) < std::abs(accel_ * speed_ * dx_) ? targetX_ - x_ : accel_ * speed_ * dx_;

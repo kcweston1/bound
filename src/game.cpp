@@ -218,7 +218,7 @@ void Game::mouseButtonEvent(int x, int y, uint8_t button, bool state)
 void Game::initLevels()
 {
     level_.generate(tileSheet_, LevelOne, LevelOneBoundary, 64, 64);
-    player_.getSprite().setDstRect({W / 2, H / 2, PlayerWidth, PlayerHeight});
+    player_.getSprite().setDstRect({W / 2, H / 2, PLAYER_WIDTH, PLAYER_HEIGHT});
     player_.setX(W / 2);
     player_.setY(H / 2);
     explosion_.getSprite().setDstRect({W / 4, H / 4, 64, 64});

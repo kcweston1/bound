@@ -9,8 +9,6 @@
 class SDL_Renderer;
 class SDL_Window;
 
-static const int TicksPerFrame = 1000 / Fps;
-
 class Renderer
 {
 public:

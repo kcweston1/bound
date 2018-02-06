@@ -75,8 +75,8 @@ void Renderer::render()
     uint32_t frameTicks = SDL_GetTicks() - ticks_;
 
     // Force the correct FPS.
-    if (frameTicks < TicksPerFrame)
-        SDL_Delay(TicksPerFrame - frameTicks);
+    if (frameTicks < TICKS_PER_FRAME)
+        SDL_Delay(TICKS_PER_FRAME - frameTicks);
 
     renderables_.clear();
 

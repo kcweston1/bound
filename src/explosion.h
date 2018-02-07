@@ -1,11 +1,13 @@
 #ifndef EXPLOSION_H
 #define EXPLOSION_H
 
+#include <SDL2/SDL.h>
+#include <memory>
 #include "sprite.h"
 #include "timer.h"
 
-static const uint32_t Frequency = 2000;
-static const uint32_t ExplodeTime = 1000;
+static const int Frequency = 1500;
+static const int ExplodeTime = 500;
 static const std::size_t ExplodeSize = 74;
 
 class Explosion
@@ -16,6 +18,12 @@ public:
 	{
 		timer_.start();
 	}
+	Explosion(const SDL_Rect& dst, std::shared_ptr<SpriteSheet> spriteSheet, int frequency, uint32_t delay=0)
+		: frequency_(frequency), active_(false), rectIndex_(0), sprite_(Sprite(dst, spriteSheet))
+	{
+		timer_.start(delay);
+	}
+
 	Sprite& getSprite()
 	{
 		return sprite_;

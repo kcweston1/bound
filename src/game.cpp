@@ -79,9 +79,7 @@ bool Game::init()
 
     //player_.setSpriteSheet(playerSheet_);
     player_.getSprite().setSpriteSheet(playerSheet_);
-    explosion_.getSprite().setSpriteSheet(explosionSheet_);
     
-
     // Populates vector "levels_" with data from levels
     initLevels();
 
@@ -111,14 +109,18 @@ void Game::mainLoop()
     {
         // Update the game objects.
         player_.move(level_);
-        explosion_.update();
+        for (Explosion& explosion : explosions_)
+            explosion.update();
 
         // Submit the sprites to the renderer.
         for (Sprite& tile : level_.getTiles())
             renderer_.submit(&tile);
         renderer_.submit(&player_.getSprite());
-        if (explosion_.getActive())
-            renderer_.submit(&explosion_.getSprite());
+        for (Explosion& explosion : explosions_)
+        {
+            if (explosion.getActive())
+                renderer_.submit(&explosion.getSprite());
+        }
 
         // Render the frame.
         renderer_.render();
@@ -221,7 +223,16 @@ void Game::initLevels()
     player_.getSprite().setDstRect({W / 2, H / 2, PLAYER_WIDTH, PLAYER_HEIGHT});
     player_.setX(W / 2);
     player_.setY(H / 2);
-    explosion_.getSprite().setDstRect({W / 4, H / 4, 64, 64});
+    int delay = 1000;
+    for (int y = 128; y < 768; y += 64)
+    {   delay-= 100;
+        for (int x = 288; x < W - 288; x += 64)
+        {
+            if (x == 416 && y == 384)
+                continue;
+            explosions_.push_back(Explosion({x, y, 64, 64}, explosionSheet_, 1000, delay));
+        }
+    }
 }
 
 

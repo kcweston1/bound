@@ -4,7 +4,7 @@
 
 //TODO: make Player::init()
 Player::Player()
-    : sprite_(), dir_(0), runState_(STAND), x_(0), y_(0), dx_(0), dy_(0), speed_(5.0f),
+    : sprite_(), dir_(0), runState_(STAND), x_(0), y_(0), dx_(0), dy_(0), speed_(3.0f),
       accel_(0), targetX_(0), targetY_(0), alive_(true)
 {
     timer_.start();

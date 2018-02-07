@@ -36,7 +36,7 @@ private:
     std::shared_ptr<SpriteSheet> tileSheet_;
     std::shared_ptr<SpriteSheet> playerSheet_;
     std::shared_ptr<SpriteSheet> explosionSheet_;
-    Explosion explosion_;
+    std::vector<Explosion> explosions_;
 };
 
 #endif

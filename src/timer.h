@@ -10,12 +10,12 @@ class Timer
 public:
     Timer();
     bool isRunning() const;
-    void start();
+    void start(int delay=0);
     void stop();
-    uint32_t time() const;
+    int time() const;
 private:
     bool running_;
-    uint32_t ticks_;
+    int ticks_;
 };
 
 #endif

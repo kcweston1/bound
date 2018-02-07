@@ -12,10 +12,10 @@ bool Timer::isRunning() const
 }
 
 
-void Timer::start()
+void Timer::start(int delay)
 {
     running_ = true;
-    ticks_ = SDL_GetTicks();
+    ticks_ = SDL_GetTicks() + delay;
 }
 
 
@@ -26,7 +26,7 @@ void Timer::stop()
 }
 
 
-uint32_t Timer::time() const
+int Timer::time() const
 {
-    return SDL_GetTicks() - ticks_;
+    return static_cast<int>(SDL_GetTicks()) - ticks_;
 }

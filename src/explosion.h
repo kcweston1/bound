@@ -6,8 +6,8 @@
 #include "sprite.h"
 #include "timer.h"
 
-static const int Frequency = 1500;
-static const int ExplodeTime = 500;
+static const int Frequency = 500;
+static const int ExplodeTime = 1000;
 static const std::size_t ExplodeSize = 74;
 
 class Explosion

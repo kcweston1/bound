@@ -1,125 +1,40 @@
 #include "player.h"
 #include "constants.h"
+#define _USE_MATH_DEFINES
 #include <cmath>
 
-//TODO: make Player::init()
 Player::Player()
-    : sprite_(), dir_(0), runState_(STAND), x_(0), y_(0), dx_(0), dy_(0), speed_(3.0f),
-      accel_(0), targetX_(0), targetY_(0), alive_(true)
 {
-    timer_.start();
+    init(Vec2(1.0, 1.0));
 }
 
 
-Player::Player(std::shared_ptr<SpriteSheet> spriteSheet)
-    : sprite_(spriteSheet), dir_(0), runState_(STAND), x_(0), y_(0), dx_(0), dy_(0), speed_(1),
-      accel_(0), targetX_(0), targetY_(0), alive_(true)
-{}
+void Player::init(const Vec2& position)
+{
+    speed_ = 3.0f;
+    accel_ = 0.0f;
+    alive_ = true;
+    runState_ = STAND;
+    position_ = position;
+    target_ = position;
+    normal_ = Vec2(0, -1);
+    dir_ = Vec2::toCardinalDirection8(normal_);
+    runState_ = STAND;
+    sprite_.setDstRect({static_cast<int>(std::round(position.x)), 
+                        static_cast<int>(std::round(position.y)), 
+                        PLAYER_WIDTH,
+                        PLAYER_HEIGHT});
+    if (sprite_.getSpriteSheet() != nullptr)
+        sprite_.setSrcRect(
+            sprite_.getSpriteSheet()->getSrcRect((dir_ * 8) + runState_));
+    timer_.start();
+    moveTimer_.start();
+}
 
 
-Player::Player(const SDL_Rect& dst, std::shared_ptr<SpriteSheet> spriteSheet)
-    : sprite_(dst, spriteSheet), dir_(0), runState_(STAND), x_(dst.x), y_(dst.y), dx_(0), dy_(0),
-      speed_(1), accel_(0), targetX_(0), targetY_(0), alive_(true)
-{}
-
-
-Player::Player(const SDL_Rect& dst, const SDL_Rect& src, std::shared_ptr<SpriteSheet> spriteSheet)
-    : sprite_(dst, src, spriteSheet), dir_(0), runState_(STAND), x_(dst.x), y_(dst.y),
-      dx_(0), dy_(0), speed_(1), accel_(0), targetX_(0), targetY_(0),
-      alive_(true)
-{}
-
-
-float Player::getDirection()
+int Player::getDirection() const
 {
     return dir_;
-}
-
-
-void Player::setDirection()
-{
-    if (dx_ < 0)
-    {
-        if (dy_ >= pi9_8.second && dy_ <= pi7_8.second) //West
-            dir_ = WEST;
-        else if (dy_ > pi7_8.second && dy_ <= pi5_8.second) //Southwest
-            dir_ = SOUTHWEST;
-        else if (dy_ > pi5_8.second) //South
-            dir_ = SOUTH;
-        else if (dy_ >= pi11_8.second && dy_ < pi9_8.second) //Northwest
-            dir_ = NORTHWEST;
-        else //North
-            dir_ = NORTH;
-    }
-    else if (dx_ > 0)
-    {
-        if (dy_ >= pi15_8.second && dy_ <= pi_8.second) //East
-            dir_ = EAST;
-        else if (dy_ > pi_8.second && dy_ <= pi3_8.second) //Southeast
-            dir_ = SOUTHEAST;
-        else if (dy_ > pi3_8.second) //South
-            dir_ = SOUTH;
-        else if (dy_ >= pi13_8.second && dy_ < pi15_8.second) //Northeast
-            dir_ = NORTHEAST;
-        else //North
-            dir_ = NORTH;
-    }
-    else
-    {
-        if (dy_ > 0) //South
-            dir_ = SOUTH;
-        else if (dy_ < 0) //North
-            dir_ = NORTH;
-        //else do nothing, as dy_ and dx_ are both 0;
-    }
-}
-
-
-float Player::getX()
-{
-    return x_;
-}
-
-
-void Player::setX(float x)
-{
-    x_ = x;
-}
-
-
-float Player::getY()
-{
-    return y_;
-}
-
-
-void Player::setY(float y)
-{
-    y_ = y;
-}
-
-
-float Player::getDx()
-{
-    return dx_;
-}
-
-
-void Player::setDx(float dx)
-{
-    dx_ = dx;
-}
-
-
-float Player::getDy()
-{
-    return dy_;
-}
-
-
-void Player::setDy(float dy)
-{
-    dy_ = dy;
 }
 
 
@@ -140,33 +55,16 @@ float Player::getAccel()
     return accel_;
 }
 
-int Player::getTargetX()
-{
-    return targetX_;
-}
-
-
-void Player::setTargetX(int targetX)
-{
-    targetX_ = targetX;
-}
-
-
-int Player::getTargetY()
-{
-    return targetY_;
-}
-
-
-void Player::setTargetY(int targetY)
-{
-    targetY_ = targetY;
-}
-
 
 Sprite& Player::getSprite()
 {
     return sprite_;
+}
+
+
+void Player::setSprite(const Sprite& sprite)
+{
+    sprite_ = sprite;
 }
 
 
@@ -182,75 +80,83 @@ bool Player::setAlive(bool alive)
 }
 
 
-
-void Player::move(const Level& level)
+Vec2 Player::getPosition() const
 {
-    //Update Acceleration
-    if (accel_ < 1)
-    {
-        accel_ += 0.02;
-    }
-    
-    checkCollision(level);
-    
-    //Update real position
-    x_ += std::abs(targetX_ - x_) < std::abs(accel_ * speed_ * dx_) ? targetX_ - x_ : accel_ * speed_ * dx_;
-    y_ += std::abs(targetY_ - y_) < std::abs(accel_ * speed_ * dy_) ? targetY_ - y_ : accel_ * speed_ * dy_;
-
-    //Update discrete position
-    SDL_Rect current = sprite_.getDstRect();
-    current.x = x_;
-    current.y = y_;
-
-    //Has target been met?
-    if (current.x == targetX_)
-    {
-        dx_ = 0;
-    }
-    if (current.y == targetY_)
-    {
-        dy_ = 0;
-    }
-
-    //Store updated position
-    sprite_.setDstRect(current);
-    
-    if (dy_ != 0 || dx_ != 0)
-    {
-        if (timer_.time() > 100)
-        {
-            ++runState_;
-            if (runState_ == 8) runState_ = 0;
-            timer_.start();
-        }
-    }
-    else
-    {
-        accel_ = 0;
-        runState_ = STAND;
-    }
-    
-    //Update src rect to correspond to correct sprite
-    sprite_.setSrcRect(sprite_.getSpriteSheet()->getSrcRect((dir_ * 8) + runState_));
+    return position_;
 }
 
 
-void Player::updateMovement(int mouseX, int mouseY)
+void Player::setPosition(const Vec2& position)
 {
-    SDL_Rect dst = sprite_.getDstRect();
-    targetX_ = mouseX - dst.w / 2;
-    targetY_ = mouseY - (3 * dst.h) / 4 ;
+    position_ = position;
+}
 
-    if (targetX_ == dst.x && targetY_ == dst.y)
+
+void Player::setTarget(int x, int y)
+{
+    target_.x = static_cast<float>(x) - 
+                static_cast<float>(PLAYER_WIDTH) / 2.0f;
+    target_.y = static_cast<float>(y) - 
+                (3.0f * static_cast<float>(PLAYER_HEIGHT) / 4.0f);
+}
+
+
+void Player::update()
+{
+    // Update movement only if enough time has passed.
+    if (moveTimer_.time() < 20)
         return;
 
-    dx_ = (targetX_ - dst.x) / hypot((targetX_ - dst.x), (targetY_ - dst.y));
-    dy_ = (targetY_ - dst.y) / hypot((targetX_ - dst.x), (targetY_ - dst.y));
+    // Confirm we have not already at the target.
+    if (position_ == target_)
+        return;
 
-    setDirection();
+    // Update Acceleration
+    if (accel_ < 1)
+        accel_ += 0.02;
+
+    // Calculate tne normal vector.
+    normal_ = Vec2::normalize(target_ - position_);
+
+    // Update the cardinal direction.
+    dir_ = Vec2::toCardinalDirection8(normal_);
+
+    // Calculate the velocity.
+    velocity_ = Vec2::clamp(normal_ * (speed_ * accel_), Vec2::length(target_ - position_));
+
+    // Update the run state based on the timer.
+    if (timer_.time() > 100)
+    {
+        ++runState_;
+        if (runState_ == 8) runState_ = 0;
+        timer_.start();
+    }
+
+    // Update the position.
+    position_ += velocity_;
+
+    // Set the run state if we reach the target.
+    if (position_ == target_)
+    {
+        runState_ = STAND;
+        accel_ = 0;
+    }
+
+    // Update the destination rect.
+    SDL_Rect current = sprite_.getDstRect();
+    current.x = static_cast<int>(std::round(position_.x));
+    current.y = static_cast<int>(std::round(position_.y));
+    sprite_.setDstRect(current);
+
+    // Update the source rect.
+    sprite_.setSrcRect(sprite_.getSpriteSheet()->getSrcRect((dir_ * 8) + runState_));
+
+    // Restart the timer.
+    moveTimer_.start();
 }
 
 
+/*
 void Player::checkCollision(const Level& level)
 {
     checkTileCollision(level);
@@ -258,12 +164,11 @@ void Player::checkCollision(const Level& level)
     checkObjectCollision();
 }
 
-
 void Player::checkTileCollision(const Level& level)
 {
     SDL_Rect newPosY = sprite_.getDstRect();
     SDL_Rect newPosX = sprite_.getDstRect();
-    newPosX.x = x_ + (accel_ * speed_ * dx_);
+    newPosX.x = position_.x + (accel_ * speed_ * dx_);
     newPosY.y = y_ + (accel_ * speed_ * dy_);
     for (const SDL_Rect& rect : level.getBoundary())
     {
@@ -277,35 +182,24 @@ void Player::checkTileCollision(const Level& level)
 
 void Player::checkScreenCollision() 
 {
-    
-/*
       checkScreenCollision should check whether the player will be out of bounds
       after moving. If yes, prevent movement.
-*/
 }
 
 
 void Player::checkObjectCollision()
 {
-/*
       checkObjectCollision should check whether the player is currently colliding
       with an object that affects the player (e.g. causes death)
-*/
-
 }
+*/
 
 
 std::ostream & operator<<(std::ostream & cout, Player & p)
 {
     cout << "dir:" << p.getDirection()
-         << " x:" << p.getX()
-         << " y:" << p.getY()
-         << " dx:" << p.getDx()
-         << " dy:" << p.getDy()
          << " speed:" << p.getSpeed()
          << " accel:" << p.getAccel()
-         << " target x:" << p.getTargetX()
-         << " target y:" << p.getTargetY()
          << " alive:" << p.isAlive();
 
     return cout;

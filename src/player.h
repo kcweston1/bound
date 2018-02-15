@@ -7,43 +7,32 @@
 #include "spritesheet.h"
 #include "level.h"
 #include "timer.h"
+#include "vec2.h"
 
 class Player
 {
 public:
     Player();
-    Player(std::shared_ptr<SpriteSheet> spriteSheet);
-    Player(const SDL_Rect& dst, std::shared_ptr<SpriteSheet> spriteSheet);
-    Player(const SDL_Rect& dst, const SDL_Rect& src, std::shared_ptr<SpriteSheet> spriteSheet);
 
-    
-    float getDirection();
+    void init(const Vec2& position);
+    int getDirection() const;
     void setDirection();
-    float getX();
-    void setX(float x);
-    float getY();
-    void setY(float y);
-    float getDx();
-    void setDx(float dx);
-    float getDy();
-    void setDy(float dy);
     float getSpeed();
     void setSpeed(float speed);
     float getAccel();
-    int getTargetX();
-    void setTargetX(int targetX);
-    int getTargetY();
-    void setTargetY(int targetY);
     Sprite& getSprite();
+    void setSprite(const Sprite& sprite);
     bool isAlive();
     bool setAlive(bool alive);
+    Vec2 getPosition() const;
+    void setPosition(const Vec2& position);
+    void setTarget(int x, int y);
     
-    void move(const Level& level);
-    void updateMovement(int mouseX, int mouseY);
-    void checkCollision(const Level& level);
-    void checkTileCollision(const Level& level);
-    void checkScreenCollision();
-    void checkObjectCollision();
+    void update();
+    //void checkCollision(const Level& level);
+    //void checkTileCollision(const Level& level);
+    //void checkScreenCollision();
+    //void checkObjectCollision();
 
     
     
@@ -51,16 +40,15 @@ public:
 private:
     Sprite sprite_;
     Timer timer_;
+    Timer moveTimer_;
     int dir_; //Dictates which direction the player sprite is facing, 0-7
     int runState_;
-    float x_;
-    float y_;
-    float dx_;
-    float dy_;
+    Vec2 position_;
+    Vec2 target_;
+    Vec2 normal_;
+    Vec2 velocity_;
     float speed_;
     float accel_; //0.0-1.0
-    int targetX_;
-    int targetY_;
     bool alive_;
 };
 

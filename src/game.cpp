@@ -25,6 +25,7 @@ bool Game::init()
     bool success = true;
     // Initialize members.
     window_ = nullptr;
+    levelNumber_ = 0;
 
     // Initialize SDL2.
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
@@ -66,7 +67,7 @@ bool Game::init()
         return false;
 
     playerSheet_ = std::shared_ptr<SpriteSheet>(new SpriteSheet());
-    if (!playerSheet_->init("assets/Player.png", renderer_.getSDLRenderer(), SDL_PIXELFORMAT_RGBA8888))
+    if (!playerSheet_->init("assets/PlayerSheet.png", renderer_.getSDLRenderer(), SDL_PIXELFORMAT_RGBA8888))
         return false;
 
     explosionSheet_ = std::shared_ptr<SpriteSheet>(new SpriteSheet());
@@ -77,8 +78,7 @@ bool Game::init()
     playerSheet_->generate();
     explosionSheet_->generate(0, 0, 100, 100);
 
-    //player_.setSpriteSheet(playerSheet_);
-    player_.getSprite().setSpriteSheet(playerSheet_);
+    player_.setSprite(Sprite(playerSheet_));
     
     // Populates vector "levels_" with data from levels
     initLevels();
@@ -108,9 +108,11 @@ void Game::mainLoop()
     while (eventHandler())
     {
         // Update the game objects.
-        player_.move(level_);
+        player_.update();
         for (Explosion& explosion : explosions_)
             explosion.update();
+
+        // Collision goes here
 
         // Submit the sprites to the renderer.
         for (Sprite& tile : level_.getTiles())
@@ -161,7 +163,7 @@ bool Game::eventHandler()
         case SDL_MOUSEMOTION:
             if (SDL_GetMouseState(&mouseX, &mouseY))
             {
-                player_.updateMovement(mouseX, mouseY);
+                player_.setTarget(mouseX, mouseY);
             }
             
             break;
@@ -220,12 +222,10 @@ void Game::mouseButtonEvent(int x, int y, uint8_t button, bool state)
 void Game::initLevels()
 {
     level_.generate(tileSheet_, LevelOne, LevelOneBoundary, 64, 64);
-    player_.getSprite().setDstRect({W / 2, H / 2, PLAYER_WIDTH, PLAYER_HEIGHT});
-    player_.setX(W / 2);
-    player_.setY(H / 2);
-    int delay = 1000;
+    player_.init(Vec2(W / 2.0f, H / 2.0f));
+    int delay = 5000;
     for (int y = 128; y < 768; y += 64)
-    {   delay-= 100;
+    {   delay-= 500;
         for (int x = 288; x < W - 288; x += 64)
         {
             if (x == 416 && y == 384)
@@ -239,7 +239,7 @@ void Game::initLevels()
 void Game::issueMoveCommand(int mouseX, int mouseY)
 {
     // Update the player's direction, target coordinates, etc
-    player_.updateMovement(mouseX, mouseY);
+    player_.setTarget(mouseX, mouseY);
 
     // Update position of the target "blip" rect
     // TODO

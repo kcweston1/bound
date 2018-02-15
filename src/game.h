@@ -29,6 +29,7 @@ public:
     void issueMoveCommand(int mouseX, int mouseY);
     
 private:
+    int levelNumber_;
     Player player_;
     Level level_;
     SDL_Window * window_;

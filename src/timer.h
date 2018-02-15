@@ -5,6 +5,8 @@
     Simple class to model a timer with basic timing functionality.
 */
 
+#include <chrono>
+
 class Timer
 {
 public:
@@ -12,10 +14,11 @@ public:
     bool isRunning() const;
     void start(int delay=0);
     void stop();
-    int time() const;
+    float time() const;
 private:
     bool running_;
     int ticks_;
+    std::chrono::high_resolution_clock::time_point start_;
 };
 
 #endif

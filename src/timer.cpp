@@ -14,6 +14,7 @@ bool Timer::isRunning() const
 
 void Timer::start(int delay)
 {
+	start_ = std::chrono::high_resolution_clock::now();
     running_ = true;
     ticks_ = SDL_GetTicks() + delay;
 }
@@ -26,7 +27,9 @@ void Timer::stop()
 }
 
 
-int Timer::time() const
+float Timer::time() const
 {
-    return static_cast<int>(SDL_GetTicks()) - ticks_;
+	std::chrono::duration<float, std::milli> dur = std::chrono::high_resolution_clock::now() - start_;
+	return dur.count();
+    //return static_cast<int>(SDL_GetTicks()) - ticks_;
 }

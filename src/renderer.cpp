@@ -58,24 +58,27 @@ void Renderer::submit(Sprite* sprite)
 
 void Renderer::render()
 {
-    // Clear the screen and render the sprites.
-    SDL_RenderClear(renderer_);
-
-    for (Sprite* sprite : renderables_)
+    if (timer_.time() >= RENDER_INTERVAL)
     {
-        SDL_RenderCopy(renderer_,
-            sprite->getSpriteSheet()->getSDLTexture(),
-            &sprite->getSrcRect(),
-            &sprite->getDstRect());
+        // Clear the screen and render the sprites.
+        SDL_RenderClear(renderer_);
+
+        for (Sprite* sprite : renderables_)
+        {
+            SDL_RenderCopy(renderer_,
+                sprite->getSpriteSheet()->getSDLTexture(),
+                &sprite->getSrcRect(),
+                &sprite->getDstRect());
+        }
+
+        SDL_RenderPresent(renderer_);
+
+        // Force the correct FPS.
+        //if (timer_.time() < TICKS_PER_FRAME)
+            //SDL_Delay(TICKS_PER_FRAME - timer_.time());
+
+
+        timer_.start();
     }
-
-    SDL_RenderPresent(renderer_);
-
-    // Force the correct FPS.
-    if (timer_.time() < TICKS_PER_FRAME)
-        SDL_Delay(TICKS_PER_FRAME - timer_.time());
-
     renderables_.clear();
-
-    timer_.start();
 }

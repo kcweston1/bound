@@ -16,6 +16,14 @@ Sprite::Sprite(const SDL_Rect& dst, std::shared_ptr<SpriteSheet> spriteSheet)
 }
 
 
+void Sprite::operator=(const Sprite& sprite)
+{
+    src_ = sprite.src_;
+    dst_ = sprite.dst_;
+    spriteSheet_ = sprite.spriteSheet_;
+}
+
+
 Sprite::Sprite(const SDL_Rect& dst, const SDL_Rect& src, std::shared_ptr<SpriteSheet> spriteSheet)
     : Entity(dst), src_(src), spriteSheet_(spriteSheet)
 {}

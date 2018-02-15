@@ -12,6 +12,7 @@ public:
     Sprite(std::shared_ptr<SpriteSheet> spriteSheet);
     Sprite(const SDL_Rect& dst, std::shared_ptr<SpriteSheet> spriteSheet);
     Sprite(const SDL_Rect& dst, const SDL_Rect& src, std::shared_ptr<SpriteSheet> spriteSheet);
+    void operator=(const Sprite& sprite);
     const SDL_Rect& getSrcRect() const;
     void setSrcRect(const SDL_Rect& src);
     std::shared_ptr<SpriteSheet> getSpriteSheet();
